@@ -5,7 +5,7 @@ import logoImg from '@assets/Screenshot_2025-10-04_122812-removebg-preview_17595
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 animate-gradient bg-gradient-to-br from-primary-purple via-secondary-blue to-accent-orange opacity-10" />
       
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 text-center">

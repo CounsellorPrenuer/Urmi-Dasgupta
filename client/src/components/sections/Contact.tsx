@@ -20,7 +20,7 @@ export function Contact() {
   ];
 
   return (
-    <section className="py-24 md:py-32 bg-background" ref={ref}>
+    <section id="contact" className="py-24 md:py-32 bg-background" ref={ref}>
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

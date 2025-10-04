@@ -1,3 +1,4 @@
+import { Navbar } from '@/components/Navbar';
 import { CursorTrail } from '@/components/CursorTrail';
 import { Hero } from '@/components/sections/Hero';
 import { Stats } from '@/components/sections/Stats';
@@ -16,6 +17,7 @@ import { Footer } from '@/components/sections/Footer';
 export default function Home() {
   return (
     <div className="min-h-screen">
+      <Navbar />
       <CursorTrail />
       <Hero />
       <Stats />
