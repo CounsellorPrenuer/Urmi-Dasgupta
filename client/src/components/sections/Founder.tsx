@@ -80,14 +80,14 @@ export function Founder() {
             initial={{ opacity: 0, x: 30 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8 }}
-            className="order-1 lg:order-2"
+            className="order-1 lg:order-2 flex justify-center"
           >
-            <div className="relative">
+            <div className="relative max-w-md w-full">
               <div className="absolute inset-0 bg-gradient-to-br from-primary-purple to-secondary-blue rounded-3xl blur-3xl opacity-20 animate-pulse" />
               <img
                 src={founderImg}
                 alt="Urmi Dasgupta - Founder"
-                className="relative rounded-3xl shadow-2xl w-full h-auto object-cover"
+                className="relative rounded-3xl shadow-2xl w-full h-auto object-cover max-h-[500px]"
                 data-testid="img-founder"
               />
             </div>
