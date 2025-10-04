@@ -18,7 +18,7 @@ export default {
         input: "hsl(var(--input) / <alpha-value>)",
         // Custom Claryntia colors
         'accent-orange': 'hsl(32 100% 50% / <alpha-value>)',
-        'secondary-blue': 'hsl(195 97% 35% / <alpha-value>)',
+        'secondary-blue': 'hsl(195 97% 50% / <alpha-value>)',
         'primary-purple': 'hsl(270 73% 35% / <alpha-value>)',
         card: {
           DEFAULT: "hsl(var(--card) / <alpha-value>)",

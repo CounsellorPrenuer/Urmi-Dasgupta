@@ -116,6 +116,7 @@ export function Services() {
               animate={inView ? { opacity: 1, scale: 1 } : {}}
               transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
               className="text-center p-6"
+              data-testid={`pillar-${index}`}
             >
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary-purple/20 to-accent-orange/20 flex items-center justify-center mx-auto mb-4 animate-float">
                 <pillar.icon className="w-8 h-8 text-primary-purple" />

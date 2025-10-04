@@ -103,7 +103,7 @@ export function Blog() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-4">{post.excerpt}</p>
-                  <div className="flex items-center gap-2 text-primary-purple font-medium text-sm group-hover:gap-3 transition-all">
+                  <div className="flex items-center gap-2 text-primary-purple font-medium text-sm group-hover:gap-3 transition-all" data-testid={`link-blog-read-more-${index}`}>
                     Read More
                     <ArrowRight className="w-4 h-4" />
                   </div>

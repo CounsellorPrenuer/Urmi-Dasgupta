@@ -63,7 +63,7 @@ export function Methodology() {
               transition={{ duration: 0.6, delay: index * 0.1 }}
               className="relative"
             >
-              <Card className="glass-effect border border-card-border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 rounded-2xl p-8 h-full" data-testid={`card-step-${index}`}>
+              <Card className="glass-effect border border-card-border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 rounded-2xl p-8 h-full cursor-default" data-testid={`card-step-${index}`}>
                 <div className={`text-6xl font-serif font-bold bg-gradient-to-r ${step.color} bg-clip-text text-transparent mb-6`}>
                   {step.number}
                 </div>

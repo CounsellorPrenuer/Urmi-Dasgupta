@@ -59,7 +59,7 @@ export function WhoWeHelp() {
               transition={{ duration: 0.6, delay: index * 0.1 }}
               className="h-full"
             >
-              <Card className="h-full glass-effect border border-card-border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 rounded-2xl overflow-visible group" data-testid={`card-audience-${index}`}>
+              <Card className="h-full glass-effect border border-card-border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 rounded-2xl overflow-visible group cursor-pointer" data-testid={`card-audience-${index}`}>
                 <CardHeader className="space-y-0 pb-4">
                   <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-purple/10 to-secondary-blue/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform ${audience.color}`}>
                     <audience.icon className="w-8 h-8" />
