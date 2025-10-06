@@ -418,6 +418,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: "created",
       });
 
+      await storage.createPaymentTracking({
+        razorpayOrderId: order.id,
+        name: customerInfo.name,
+        email: customerInfo.email,
+        phone: customerInfo.phone,
+        packageId: pkg.id,
+        packageName: pkg.name,
+        status: "pending",
+      });
+
       res.json({
         success: true,
         orderId: order.id,
@@ -490,19 +500,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .digest("hex");
 
       if (razorpay_signature === expectedSign) {
-        const paymentRecord = await storage.createPaymentTracking({
-          name: storedOrder.customerName,
-          email: storedOrder.customerEmail,
-          phone: storedOrder.customerPhone,
-          packageId: pkg.id,
-          packageName: pkg.name,
-          status: "completed",
-        });
-
+        await storage.updatePaymentTrackingStatus(razorpay_order_id, "completed");
         await storage.updateRazorpayOrderStatus(razorpay_order_id, "completed");
 
         console.log("Payment verified successfully:", {
-          paymentId: paymentRecord.id,
           packageName: pkg.name,
           customerEmail: storedOrder.customerEmail,
           razorpay_payment_id,
@@ -512,7 +513,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.json({
           success: true,
           message: "Payment verified successfully",
-          paymentId: paymentRecord.id,
         });
       } else {
         console.error("Payment verification failed: Invalid signature", {
@@ -521,15 +521,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           packageId: pkg.id,
         });
 
-        await storage.createPaymentTracking({
-          name: storedOrder.customerName,
-          email: storedOrder.customerEmail,
-          phone: storedOrder.customerPhone,
-          packageId: pkg.id,
-          packageName: pkg.name,
-          status: "failed",
-        });
-
+        await storage.updatePaymentTrackingStatus(razorpay_order_id, "failed");
         await storage.updateRazorpayOrderStatus(razorpay_order_id, "failed_invalid_signature");
 
         res.status(400).json({
@@ -539,29 +531,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error) {
       console.error("Payment verification error:", error);
-      
-      try {
-        if (req.body.razorpay_order_id) {
-          const storedOrder = await storage.getRazorpayOrderByOrderId(req.body.razorpay_order_id);
-          if (storedOrder) {
-            await storage.createPaymentTracking({
-              name: storedOrder.customerName,
-              email: storedOrder.customerEmail,
-              phone: storedOrder.customerPhone,
-              packageId: storedOrder.packageId,
-              packageName: storedOrder.packageName,
-              status: "failed",
-            });
-            await storage.updateRazorpayOrderStatus(req.body.razorpay_order_id, "failed_error");
-          }
-        }
-      } catch (trackingError) {
-        console.error("Failed to create error tracking record:", trackingError);
+      res.status(500).json({ 
+        success: false, 
+        message: "Payment verification error" 
+      });
+    }
+  });
+
+  app.post("/api/payment/cancel", async (req, res) => {
+    try {
+      const { razorpay_order_id } = req.body;
+
+      if (!razorpay_order_id) {
+        return res.status(400).json({
+          success: false,
+          message: "Order ID is required",
+        });
       }
 
-      res.status(500).json({
-        success: false,
-        message: "Error verifying payment",
+      await storage.updatePaymentTrackingStatus(razorpay_order_id, "cancelled");
+      await storage.updateRazorpayOrderStatus(razorpay_order_id, "cancelled");
+
+      console.log("Payment cancelled:", { razorpay_order_id });
+
+      res.json({
+        success: true,
+        message: "Payment cancelled",
+      });
+    } catch (error) {
+      console.error("Payment cancellation error:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Error cancelling payment" 
       });
     }
   });

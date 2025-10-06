@@ -169,8 +169,23 @@ export function Packages() {
           }
         },
         modal: {
-          ondismiss: function () {
+          ondismiss: async function () {
             setIsProcessing(false);
+            
+            try {
+              await fetch('/api/payment/cancel', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  razorpay_order_id: orderData.orderId,
+                }),
+              });
+            } catch (error) {
+              console.error('Error cancelling payment:', error);
+            }
+            
             toast({
               title: "Payment Cancelled",
               description: "You have cancelled the payment process.",
@@ -179,11 +194,8 @@ export function Packages() {
         },
       };
 
-      // --- CHANGE IS HERE ---
-      // 1. Close the dialog form first.
       setIsPaymentDialogOpen(false);
 
-      // 2. Then, open the Razorpay payment gateway.
       const razorpay = new window.Razorpay(options);
       razorpay.open();
 

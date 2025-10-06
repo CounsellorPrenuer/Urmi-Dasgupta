@@ -49,6 +49,7 @@ export const packages = pgTable("packages", {
 
 export const paymentTracking = pgTable("payment_tracking", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  razorpayOrderId: text("razorpay_order_id"),
   name: text("name").notNull(),
   email: text("email").notNull(),
   phone: text("phone").notNull(),

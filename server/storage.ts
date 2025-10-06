@@ -53,7 +53,9 @@ export interface IStorage {
   createPaymentTracking(payment: InsertPaymentTracking): Promise<PaymentTracking>;
   getPaymentTrackings(): Promise<PaymentTracking[]>;
   getPaymentTracking(id: string): Promise<PaymentTracking | undefined>;
+  getPaymentTrackingByOrderId(razorpayOrderId: string): Promise<PaymentTracking | undefined>;
   updatePaymentTracking(id: string, payment: Partial<InsertPaymentTracking>): Promise<PaymentTracking>;
+  updatePaymentTrackingStatus(razorpayOrderId: string, status: string): Promise<PaymentTracking>;
   deletePaymentTracking(id: string): Promise<void>;
   
   createRazorpayOrder(order: InsertRazorpayOrder): Promise<RazorpayOrder>;
@@ -199,11 +201,25 @@ export class DatabaseStorage implements IStorage {
     return payment || undefined;
   }
 
+  async getPaymentTrackingByOrderId(razorpayOrderId: string): Promise<PaymentTracking | undefined> {
+    const [payment] = await db.select().from(paymentTracking).where(eq(paymentTracking.razorpayOrderId, razorpayOrderId));
+    return payment || undefined;
+  }
+
   async updatePaymentTracking(id: string, data: Partial<InsertPaymentTracking>): Promise<PaymentTracking> {
     const [payment] = await db
       .update(paymentTracking)
       .set(data)
       .where(eq(paymentTracking.id, id))
+      .returning();
+    return payment;
+  }
+
+  async updatePaymentTrackingStatus(razorpayOrderId: string, status: string): Promise<PaymentTracking> {
+    const [payment] = await db
+      .update(paymentTracking)
+      .set({ status })
+      .where(eq(paymentTracking.razorpayOrderId, razorpayOrderId))
       .returning();
     return payment;
   }
