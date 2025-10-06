@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { User, ArrowRight } from 'lucide-react';
 import Masonry from 'react-masonry-css';
@@ -16,10 +18,13 @@ const gradients = [
 
 export function Blog() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
+  const [showAll, setShowAll] = useState(false);
   
   const { data: blogPosts = [], isLoading } = useQuery<BlogType[]>({
     queryKey: ['/api/blogs'],
   });
+
+  const displayedBlogs = showAll ? blogPosts : blogPosts.slice(0, 3);
 
   const breakpointColumns = {
     default: 3,
@@ -53,55 +58,76 @@ export function Blog() {
             <p className="text-muted-foreground">No blog posts available at the moment.</p>
           </div>
         ) : (
-          <Masonry
-            breakpointCols={breakpointColumns}
-            className="flex -ml-6 w-auto"
-            columnClassName="pl-6 bg-clip-padding"
-          >
-            {blogPosts.map((post, index) => (
-              <motion.div
-                key={post.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="mb-6"
-              >
-                <Card 
-                  className="glass-effect border border-card-border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 rounded-2xl overflow-visible group cursor-pointer"
-                  data-testid={`card-blog-${index}`}
+          <>
+            <Masonry
+              breakpointCols={breakpointColumns}
+              className="flex -ml-6 w-auto"
+              columnClassName="pl-6 bg-clip-padding"
+            >
+              {displayedBlogs.map((post, index) => (
+                <motion.div
+                  key={post.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={inView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  className="mb-6"
                 >
-                  {post.imageUrl ? (
-                    <div className="h-32 relative overflow-hidden rounded-t-2xl">
-                      <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-br from-transparent to-primary-purple/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </div>
-                  ) : (
-                    <div className={`h-32 bg-gradient-to-br ${gradients[index % gradients.length]} relative overflow-hidden rounded-t-2xl`}>
-                      <div className="absolute inset-0 bg-gradient-to-br from-transparent to-primary-purple/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </div>
-                  )}
-                  <CardHeader className="space-y-0 pb-3">
-                    {post.author && (
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground mb-3">
-                        <User className="w-3 h-3" />
-                        <span>{post.author}</span>
+                  <Card 
+                    className="glass-effect border border-card-border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 rounded-2xl overflow-visible group cursor-pointer"
+                    data-testid={`card-blog-${index}`}
+                  >
+                    {post.imageUrl ? (
+                      <div className="h-32 relative overflow-hidden rounded-t-2xl">
+                        <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-transparent to-primary-purple/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      </div>
+                    ) : (
+                      <div className={`h-32 bg-gradient-to-br ${gradients[index % gradients.length]} relative overflow-hidden rounded-t-2xl`}>
+                        <div className="absolute inset-0 bg-gradient-to-br from-transparent to-primary-purple/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </div>
                     )}
-                    <CardTitle className="font-serif text-xl group-hover:text-primary-purple transition-colors">
-                      {post.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-4">{post.excerpt}</p>
-                    <div className="flex items-center gap-2 text-primary-purple font-medium text-sm group-hover:gap-3 transition-all" data-testid={`link-blog-read-more-${index}`}>
-                      Read More
-                      <ArrowRight className="w-4 h-4" />
-                    </div>
-                  </CardContent>
-                </Card>
+                    <CardHeader className="space-y-0 pb-3">
+                      {post.author && (
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground mb-3">
+                          <User className="w-3 h-3" />
+                          <span>{post.author}</span>
+                        </div>
+                      )}
+                      <CardTitle className="font-serif text-xl group-hover:text-primary-purple transition-colors">
+                        {post.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground mb-4">{post.excerpt}</p>
+                      <div className="flex items-center gap-2 text-primary-purple font-medium text-sm group-hover:gap-3 transition-all" data-testid={`link-blog-read-more-${index}`}>
+                        Read More
+                        <ArrowRight className="w-4 h-4" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </Masonry>
+            
+            {blogPosts.length > 3 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={inView ? { opacity: 1 } : {}}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="text-center mt-12"
+              >
+                <Button
+                  onClick={() => setShowAll(!showAll)}
+                  variant="outline"
+                  size="lg"
+                  className="glass-effect"
+                  data-testid="button-see-more-blogs"
+                >
+                  {showAll ? 'Show Less' : 'See More'}
+                </Button>
               </motion.div>
-            ))}
-          </Masonry>
+            )}
+          </>
         )}
       </div>
     </section>
