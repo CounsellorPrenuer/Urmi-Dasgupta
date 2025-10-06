@@ -2,7 +2,6 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useQuery } from '@tanstack/react-query';
 import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards';
-import { Star } from 'lucide-react';
 import type { Testimonial } from '@shared/schema';
 
 export function Testimonials() {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useQuery } from '@tanstack/react-query';
@@ -9,7 +9,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Check } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import useEmblaCarousel from 'embla-carousel-react';
 import type { Package } from '@shared/schema';
 
 declare global {
@@ -20,7 +21,6 @@ declare global {
 
 export function Packages() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
-  const [showAll, setShowAll] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -35,7 +35,30 @@ export function Packages() {
     queryKey: ['/api/packages'],
   });
 
-  const displayedPackages = showAll ? packages : packages.slice(0, 3);
+  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+    loop: false,
+    align: 'start',
+    containScroll: 'trimSnaps'
+  });
+  
+  const [prevBtnEnabled, setPrevBtnEnabled] = useState(false);
+  const [nextBtnEnabled, setNextBtnEnabled] = useState(false);
+
+  const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setPrevBtnEnabled(emblaApi.canScrollPrev());
+    setNextBtnEnabled(emblaApi.canScrollNext());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on('select', onSelect);
+    emblaApi.on('reInit', onSelect);
+  }, [emblaApi, onSelect]);
 
   const handleGetStarted = (pkg: Package) => {
     setSelectedPackage(pkg);
@@ -195,77 +218,87 @@ export function Packages() {
             <p className="text-muted-foreground">No packages available at the moment.</p>
           </div>
         ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {displayedPackages.map((pkg, index) => (
-                <motion.div
-                  key={pkg.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={inView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.6, delay: index * 0.15 }}
-                  className="h-full"
-                >
-                  <Card 
-                    className="h-full flex flex-col glass-effect border border-card-border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 rounded-3xl"
-                    data-testid={`card-package-${index}`}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={inView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="relative"
+          >
+            <div className="overflow-hidden" ref={emblaRef}>
+              <div className="flex gap-6">
+                {packages.map((pkg, index) => (
+                  <div
+                    key={pkg.id}
+                    className="flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-12px)] lg:flex-[0_0_calc(33.333%-16px)]"
                   >
-                    <CardHeader className="space-y-0 pb-6 pt-8">
-                      <CardTitle className="font-serif text-2xl mb-2">{pkg.name}</CardTitle>
-                      <p className="text-sm text-muted-foreground mb-2">{pkg.description}</p>
-                      {pkg.duration && (
-                        <p className="text-xs text-muted-foreground mb-4">{pkg.duration}</p>
-                      )}
-                      <div className="font-serif text-4xl font-bold text-primary-purple" data-testid={`price-${index}`}>
-                        ₹{pkg.price.toLocaleString('en-IN')}
-                      </div>
-                    </CardHeader>
-                    
-                    <CardContent className="flex-1">
-                      <ul className="space-y-3">
-                        {pkg.features.map((feature, featureIndex) => (
-                          <li key={featureIndex} className="flex items-start gap-3">
-                            <div className="w-5 h-5 rounded-full bg-primary-purple/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                              <Check className="w-3 h-3 text-primary-purple" />
-                            </div>
-                            <span className="text-sm text-foreground">{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                    
-                    <CardFooter>
-                      <Button 
-                        onClick={() => handleGetStarted(pkg)}
-                        className="w-full rounded-full py-6 bg-primary-purple text-white"
-                        data-testid={`button-get-started-${index}`}
-                      >
-                        Get Started
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                </motion.div>
-              ))}
+                    <Card 
+                      className="h-full flex flex-col glass-effect border border-card-border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 rounded-3xl"
+                      data-testid={`card-package-${index}`}
+                    >
+                      <CardHeader className="space-y-0 pb-6 pt-8">
+                        <CardTitle className="font-serif text-2xl mb-2">{pkg.name}</CardTitle>
+                        <p className="text-sm text-muted-foreground mb-2">{pkg.description}</p>
+                        {pkg.duration && (
+                          <p className="text-xs text-muted-foreground mb-4">{pkg.duration}</p>
+                        )}
+                        <div className="font-serif text-4xl font-bold text-primary-purple" data-testid={`price-${index}`}>
+                          ₹{pkg.price.toLocaleString('en-IN')}
+                        </div>
+                      </CardHeader>
+                      
+                      <CardContent className="flex-1">
+                        <ul className="space-y-3">
+                          {pkg.features.map((feature, featureIndex) => (
+                            <li key={featureIndex} className="flex items-start gap-3">
+                              <div className="w-5 h-5 rounded-full bg-primary-purple/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <Check className="w-3 h-3 text-primary-purple" />
+                              </div>
+                              <span className="text-sm text-foreground">{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                      
+                      <CardFooter>
+                        <Button 
+                          onClick={() => handleGetStarted(pkg)}
+                          className="w-full rounded-full py-6 bg-primary-purple text-white"
+                          data-testid={`button-get-started-${index}`}
+                        >
+                          Get Started
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </div>
+                ))}
+              </div>
             </div>
-            
+
             {packages.length > 3 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={inView ? { opacity: 1 } : {}}
-                transition={{ duration: 0.6, delay: 0.5 }}
-                className="text-center mt-12"
-              >
+              <div className="flex items-center justify-center gap-4 mt-8">
                 <Button
-                  onClick={() => setShowAll(!showAll)}
+                  onClick={scrollPrev}
+                  disabled={!prevBtnEnabled}
                   variant="outline"
-                  size="lg"
-                  className="glass-effect"
-                  data-testid="button-see-more-packages"
+                  size="icon"
+                  className="rounded-full w-12 h-12 glass-effect"
+                  data-testid="button-prev-package"
                 >
-                  {showAll ? 'Show Less' : 'See More'}
+                  <ChevronLeft className="w-6 h-6" />
                 </Button>
-              </motion.div>
+                <Button
+                  onClick={scrollNext}
+                  disabled={!nextBtnEnabled}
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full w-12 h-12 glass-effect"
+                  data-testid="button-next-package"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </Button>
+              </div>
             )}
-          </>
+          </motion.div>
         )}
       </div>
 
