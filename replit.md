@@ -100,10 +100,12 @@ Each section uses intersection observers to trigger animations when scrolling in
 
 **Admin Dashboard**: Secure administrative interface for managing website content:
 - **Authentication**: Session-based authentication using express-session with PostgreSQL storage
-  - Default credentials: username: `admin`, password: `admin123`
-  - Admin user automatically initialized on server startup
-  - Secure password hashing using bcrypt
+  - Admin credentials configured via environment variables: `ADMIN_USERNAME` and `ADMIN_PASSWORD`
+  - Session secret configured via `SESSION_SECRET` environment variable (required in production)
+  - Admin user automatically created on first server startup with provided credentials
+  - Secure password hashing using bcrypt (10 salt rounds)
   - Protected routes with authentication middleware
+  - Production deployment requires all three environment variables to be set
 - **Dashboard Layout**: Shadcn sidebar navigation with the following sections:
   - Testimonials management (create, read, update, delete)
   - Blogs management (create, read, update, delete)
