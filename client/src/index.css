@@ -317,6 +317,15 @@
     50% { background-position: 100% 50%; }
   }
 
+  @keyframes scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-50% - 0.5rem));
+    }
+  }
+
   .animate-float {
     animation: float 4s ease-in-out infinite;
   }
@@ -324,6 +333,10 @@
   .animate-gradient {
     background-size: 200% 200%;
     animation: gradient-shift 8s ease infinite;
+  }
+
+  .animate-scroll {
+    animation: scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite;
   }
 
   /* Cursor trail */
