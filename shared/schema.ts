@@ -22,7 +22,6 @@ export const contactSubmissions = pgTable("contact_submissions", {
 export const testimonials = pgTable("testimonials", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
-  role: text("role").notNull(),
   content: text("content").notNull(),
   rating: integer("rating").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),

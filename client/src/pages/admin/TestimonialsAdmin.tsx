@@ -38,7 +38,6 @@ import type { Testimonial } from "@shared/schema";
 
 const testimonialSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  role: z.string().min(1, "Role is required"),
   content: z.string().min(1, "Content is required"),
   rating: z.coerce.number().min(1).max(5),
 });
@@ -58,7 +57,6 @@ export default function TestimonialsAdmin() {
     resolver: zodResolver(testimonialSchema),
     defaultValues: {
       name: "",
-      role: "",
       content: "",
       rating: 5,
     },
@@ -114,7 +112,6 @@ export default function TestimonialsAdmin() {
     setEditingTestimonial(testimonial);
     form.reset({
       name: testimonial.name,
-      role: testimonial.role,
       content: testimonial.content,
       rating: testimonial.rating,
     });
@@ -179,19 +176,6 @@ export default function TestimonialsAdmin() {
                 />
                 <FormField
                   control={form.control}
-                  name="role"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Role</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Job title or role" data-testid="input-role" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
                   name="content"
                   render={({ field }) => (
                     <FormItem>
@@ -235,7 +219,6 @@ export default function TestimonialsAdmin() {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Role</TableHead>
                 <TableHead>Content</TableHead>
                 <TableHead>Rating</TableHead>
                 <TableHead>Actions</TableHead>
@@ -245,7 +228,6 @@ export default function TestimonialsAdmin() {
               {testimonials?.map((testimonial) => (
                 <TableRow key={testimonial.id} data-testid={`row-testimonial-${testimonial.id}`}>
                   <TableCell>{testimonial.name}</TableCell>
-                  <TableCell>{testimonial.role}</TableCell>
                   <TableCell className="max-w-md truncate">{testimonial.content}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">

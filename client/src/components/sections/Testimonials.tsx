@@ -84,7 +84,6 @@ export function Testimonials() {
                       </Avatar>
                       <div>
                         <div className="font-semibold text-foreground">{testimonial.name}</div>
-                        <div className="text-sm text-muted-foreground">{testimonial.role}</div>
                       </div>
                     </div>
                   </CardContent>
