@@ -130,10 +130,12 @@ export default function BlogsAdmin() {
     }
   };
 
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
-    setEditingBlog(null);
-    form.reset();
+  const handleDialogChange = (open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open) {
+      setEditingBlog(null);
+      form.reset();
+    }
   };
 
   if (isLoading) {
@@ -147,7 +149,7 @@ export default function BlogsAdmin() {
           <h1 className="text-3xl font-bold">Blogs</h1>
           <p className="text-muted-foreground">Manage blog posts</p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
+        <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
           <DialogTrigger asChild>
             <Button data-testid="button-add-blog">
               <Plus className="w-4 h-4 mr-2" />

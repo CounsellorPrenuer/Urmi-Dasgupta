@@ -132,10 +132,12 @@ export default function PackagesAdmin() {
     }
   };
 
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
-    setEditingPackage(null);
-    form.reset();
+  const handleDialogChange = (open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open) {
+      setEditingPackage(null);
+      form.reset();
+    }
   };
 
   if (isLoading) {
@@ -149,7 +151,7 @@ export default function PackagesAdmin() {
           <h1 className="text-3xl font-bold">Packages</h1>
           <p className="text-muted-foreground">Manage service packages</p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
+        <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
           <DialogTrigger asChild>
             <Button data-testid="button-add-package">
               <Plus className="w-4 h-4 mr-2" />

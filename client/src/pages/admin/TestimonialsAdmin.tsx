@@ -127,10 +127,12 @@ export default function TestimonialsAdmin() {
     }
   };
 
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
-    setEditingTestimonial(null);
-    form.reset();
+  const handleDialogChange = (open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open) {
+      setEditingTestimonial(null);
+      form.reset();
+    }
   };
 
   if (isLoading) {
@@ -144,7 +146,7 @@ export default function TestimonialsAdmin() {
           <h1 className="text-3xl font-bold">Testimonials</h1>
           <p className="text-muted-foreground">Manage customer testimonials</p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
+        <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
           <DialogTrigger asChild>
             <Button data-testid="button-add-testimonial">
               <Plus className="w-4 h-4 mr-2" />
