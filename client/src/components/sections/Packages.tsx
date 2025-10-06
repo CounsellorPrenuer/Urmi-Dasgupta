@@ -33,7 +33,6 @@ export function Packages() {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Choose the perfect package for your transformation journey
           </p>
-          <p className="text-sm text-muted-foreground mt-2">*Price finalized post free discovery call</p>
         </motion.div>
 
         {isLoading ? (
