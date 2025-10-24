@@ -380,26 +380,24 @@ export function Packages() {
 
       {/* UPI QR Code Dialog */}
       <Dialog open={isQRDialogOpen} onOpenChange={setIsQRDialogOpen}>
-        <DialogContent className="max-w-md" data-testid="dialog-qr-code">
+        <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[95vh] overflow-y-auto" data-testid="dialog-qr-code">
           <DialogHeader>
-            <DialogTitle className="text-center">Scan to Pay</DialogTitle>
-            <DialogDescription className="text-center">
-              {selectedPackage && (
-                <div className="space-y-2">
-                  <p className="font-semibold text-lg">{selectedPackage.name}</p>
-                  <p className="text-2xl font-bold text-primary-purple">₹{selectedPackage.price.toLocaleString('en-IN')}</p>
-                </div>
-              )}
-            </DialogDescription>
+            <DialogTitle className="text-center text-lg sm:text-xl">Scan to Pay</DialogTitle>
+            {selectedPackage && (
+              <div className="space-y-1 sm:space-y-2 text-center">
+                <p className="font-semibold text-base sm:text-lg line-clamp-2">{selectedPackage.name}</p>
+                <p className="text-xl sm:text-2xl font-bold text-primary-purple">₹{selectedPackage.price.toLocaleString('en-IN')}</p>
+              </div>
+            )}
           </DialogHeader>
 
-          <div className="flex flex-col items-center space-y-6 py-4">
+          <div className="flex flex-col items-center space-y-4 sm:space-y-6 py-2 sm:py-4">
             {/* QR Code */}
-            <div className="bg-white p-6 rounded-2xl shadow-lg">
+            <div className="bg-white p-3 sm:p-6 rounded-2xl shadow-lg w-fit">
               <QRCodeSVG
                 id="upi-qr-code"
                 value={selectedPackage ? generateUPIUrl(selectedPackage.name, selectedPackage.price) : ''}
-                size={240}
+                size={window.innerWidth < 640 ? 200 : 240}
                 level="H"
                 includeMargin={true}
               />
@@ -407,12 +405,12 @@ export function Packages() {
 
             {/* UPI ID */}
             <div className="w-full space-y-2">
-              <Label className="text-sm text-muted-foreground">UPI ID</Label>
+              <Label className="text-xs sm:text-sm text-muted-foreground">UPI ID</Label>
               <div className="flex items-center gap-2">
                 <Input
                   value="joint.arum@okaxis"
                   readOnly
-                  className="flex-1 font-mono"
+                  className="flex-1 font-mono text-xs sm:text-sm"
                   data-testid="input-upi-id"
                 />
                 <Button
@@ -427,23 +425,23 @@ export function Packages() {
             </div>
 
             {/* Instructions */}
-            <div className="w-full space-y-3 bg-muted/50 p-4 rounded-lg">
-              <h4 className="font-semibold text-sm">Payment Instructions:</h4>
-              <ol className="text-sm space-y-2 text-muted-foreground list-decimal list-inside">
+            <div className="w-full space-y-2 sm:space-y-3 bg-muted/50 p-3 sm:p-4 rounded-lg">
+              <h4 className="font-semibold text-xs sm:text-sm">Payment Instructions:</h4>
+              <ol className="text-xs sm:text-sm space-y-1.5 sm:space-y-2 text-muted-foreground list-decimal list-inside">
                 <li>Open any UPI app (Google Pay, PhonePe, Paytm, etc.)</li>
                 <li>Scan the QR code or enter the UPI ID</li>
                 <li>Verify the amount: ₹{selectedPackage?.price.toLocaleString('en-IN')}</li>
                 <li>Complete the payment</li>
-                <li>We'll contact you shortly at {customerInfo.email}</li>
+                <li className="break-words">We'll contact you shortly at {customerInfo.email}</li>
               </ol>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-2 w-full">
+            <div className="flex flex-col sm:flex-row gap-2 w-full">
               <Button
                 variant="outline"
                 onClick={handleDownloadQR}
-                className="flex-1"
+                className="flex-1 text-sm"
                 data-testid="button-download-qr"
               >
                 <Download className="w-4 h-4 mr-2" />
@@ -451,7 +449,7 @@ export function Packages() {
               </Button>
               <Button
                 onClick={handleCloseQRDialog}
-                className="flex-1 bg-primary-purple text-white"
+                className="flex-1 bg-primary-purple text-white text-sm"
                 data-testid="button-close-qr"
               >
                 Done
