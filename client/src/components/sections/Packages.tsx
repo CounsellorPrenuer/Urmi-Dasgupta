@@ -219,7 +219,7 @@ export function Packages() {
           transition={{ duration: 0.6 }}
           className="text-center mb-6"
         >
-          <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-4" data-testid="text-packages-title">
+          <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4" data-testid="text-packages-title">
             Packages
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">

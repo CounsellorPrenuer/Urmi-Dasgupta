@@ -33,7 +33,7 @@ export function ChangingLandscape() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-6" data-testid="text-landscape-title">
+          <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6" data-testid="text-landscape-title">
             The Changing Landscape
           </h2>
           <p className="text-2xl md:text-3xl font-serif text-primary-purple mb-8">

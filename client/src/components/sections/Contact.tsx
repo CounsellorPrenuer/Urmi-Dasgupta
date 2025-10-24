@@ -103,7 +103,7 @@ export function Contact() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-4" data-testid="text-contact-title">
+          <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4" data-testid="text-contact-title">
             Ready to Begin Your Transformation?
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">

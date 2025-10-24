@@ -65,7 +65,7 @@ export function Services() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-4" data-testid="text-services-title">
+          <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4" data-testid="text-services-title">
             Our Services
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -103,7 +103,7 @@ export function Services() {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="text-center mb-12"
         >
-          <h3 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <h3 className="font-serif text-3xl md:text-4xl font-bold mb-4">
             Our Pillars of Excellence
           </h3>
         </motion.div>
