@@ -28,8 +28,13 @@ export function Navbar() {
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      // Close menu first for better UX
       setIsMobileMenuOpen(false);
+      
+      // Small delay to let menu animation complete, then scroll
+      setTimeout(() => {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
     }
   };
 
