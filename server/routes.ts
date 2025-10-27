@@ -5,8 +5,6 @@ import connectPgSimple from "connect-pg-simple";
 import { storage } from "./storage";
 import { pool } from "./db";
 import bcrypt from "bcrypt";
-import Razorpay from "razorpay";
-import crypto from "crypto";
 import { 
   insertContactSubmissionSchema,
   insertTestimonialSchema,
@@ -42,11 +40,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } else {
       throw new Error("SESSION_SECRET environment variable must be set in production!");
     }
-  }
-
-  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-    console.error("⚠️  ERROR: RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET must be set!");
-    throw new Error("Razorpay credentials are required");
   }
   
   app.use(
@@ -367,204 +360,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID!,
-    key_secret: process.env.RAZORPAY_KEY_SECRET!,
+  // Deprecated Razorpay routes - now using UPI payment system
+  app.post("/api/payment/create-order", (req, res) => {
+    res.status(410).json({ 
+      success: false, 
+      message: "Razorpay payment gateway deprecated. Please use UPI payment system." 
+    });
   });
 
-  app.post("/api/payment/create-order", async (req, res) => {
-    try {
-      const { packageId, customerInfo } = req.body;
-
-      if (!packageId || !customerInfo?.name || !customerInfo?.email || !customerInfo?.phone) {
-        return res.status(400).json({ 
-          success: false, 
-          message: "Missing required fields" 
-        });
-      }
-
-      const pkg = await storage.getPackage(packageId);
-      
-      if (!pkg) {
-        return res.status(404).json({
-          success: false,
-          message: "Package not found"
-        });
-      }
-
-      const options = {
-        amount: pkg.price * 100,
-        currency: "INR",
-        receipt: `receipt_${Date.now()}`,
-        notes: {
-          packageId: pkg.id,
-          packageName: pkg.name,
-          customerName: customerInfo.name,
-          customerEmail: customerInfo.email,
-          customerPhone: customerInfo.phone,
-        }
-      };
-
-      const order = await razorpay.orders.create(options);
-
-      await storage.createRazorpayOrder({
-        razorpayOrderId: order.id,
-        packageId: pkg.id,
-        packageName: pkg.name,
-        amount: pkg.price,
-        customerName: customerInfo.name,
-        customerEmail: customerInfo.email,
-        customerPhone: customerInfo.phone,
-        status: "created",
-      });
-
-      await storage.createPaymentTracking({
-        razorpayOrderId: order.id,
-        name: customerInfo.name,
-        email: customerInfo.email,
-        phone: customerInfo.phone,
-        packageId: pkg.id,
-        packageName: pkg.name,
-        status: "pending",
-      });
-
-      res.json({
-        success: true,
-        orderId: order.id,
-        amount: order.amount,
-        currency: order.currency,
-        keyId: process.env.RAZORPAY_KEY_ID,
-      });
-    } catch (error) {
-      console.error("Create order error:", error);
-      res.status(500).json({ 
-        success: false, 
-        message: "Error creating payment order" 
-      });
-    }
+  app.post("/api/payment/verify", (req, res) => {
+    res.status(410).json({ 
+      success: false, 
+      message: "Razorpay payment gateway deprecated. Please use UPI payment system." 
+    });
   });
 
-  app.post("/api/payment/verify", async (req, res) => {
-    try {
-      const { 
-        razorpay_order_id, 
-        razorpay_payment_id, 
-        razorpay_signature
-      } = req.body;
-
-      if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-        return res.status(400).json({
-          success: false,
-          message: "Missing required fields for verification",
-        });
-      }
-
-      const storedOrder = await storage.getRazorpayOrderByOrderId(razorpay_order_id);
-      
-      if (!storedOrder) {
-        console.error("Payment verification failed: Order not found", { razorpay_order_id, razorpay_payment_id });
-        return res.status(404).json({
-          success: false,
-          message: "Order not found",
-        });
-      }
-
-      const pkg = await storage.getPackage(storedOrder.packageId);
-      
-      if (!pkg) {
-        console.error("Payment verification failed: Package not found", { packageId: storedOrder.packageId, razorpay_payment_id });
-        return res.status(404).json({
-          success: false,
-          message: "Package not found",
-        });
-      }
-
-      if (pkg.price !== storedOrder.amount) {
-        console.error("Payment verification failed: Price mismatch", {
-          expectedAmount: pkg.price,
-          storedAmount: storedOrder.amount,
-          packageId: pkg.id,
-          razorpay_order_id,
-        });
-        await storage.updateRazorpayOrderStatus(razorpay_order_id, "failed_price_mismatch");
-        return res.status(400).json({
-          success: false,
-          message: "Price mismatch detected",
-        });
-      }
-
-      const sign = razorpay_order_id + "|" + razorpay_payment_id;
-      const expectedSign = crypto
-        .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
-        .update(sign)
-        .digest("hex");
-
-      if (razorpay_signature === expectedSign) {
-        await storage.updatePaymentTrackingStatus(razorpay_order_id, "completed");
-        await storage.updateRazorpayOrderStatus(razorpay_order_id, "completed");
-
-        console.log("Payment verified successfully:", {
-          packageName: pkg.name,
-          customerEmail: storedOrder.customerEmail,
-          razorpay_payment_id,
-          amount: pkg.price,
-        });
-
-        res.json({
-          success: true,
-          message: "Payment verified successfully",
-        });
-      } else {
-        console.error("Payment verification failed: Invalid signature", {
-          razorpay_order_id,
-          razorpay_payment_id,
-          packageId: pkg.id,
-        });
-
-        await storage.updatePaymentTrackingStatus(razorpay_order_id, "failed");
-        await storage.updateRazorpayOrderStatus(razorpay_order_id, "failed_invalid_signature");
-
-        res.status(400).json({
-          success: false,
-          message: "Invalid payment signature",
-        });
-      }
-    } catch (error) {
-      console.error("Payment verification error:", error);
-      res.status(500).json({ 
-        success: false, 
-        message: "Payment verification error" 
-      });
-    }
-  });
-
-  app.post("/api/payment/cancel", async (req, res) => {
-    try {
-      const { razorpay_order_id } = req.body;
-
-      if (!razorpay_order_id) {
-        return res.status(400).json({
-          success: false,
-          message: "Order ID is required",
-        });
-      }
-
-      await storage.updatePaymentTrackingStatus(razorpay_order_id, "cancelled");
-      await storage.updateRazorpayOrderStatus(razorpay_order_id, "cancelled");
-
-      console.log("Payment cancelled:", { razorpay_order_id });
-
-      res.json({
-        success: true,
-        message: "Payment cancelled",
-      });
-    } catch (error) {
-      console.error("Payment cancellation error:", error);
-      res.status(500).json({ 
-        success: false, 
-        message: "Error cancelling payment" 
-      });
-    }
+  app.post("/api/payment/cancel", (req, res) => {
+    res.status(410).json({ 
+      success: false, 
+      message: "Razorpay payment gateway deprecated. Please use UPI payment system." 
+    });
   });
 
   const httpServer = createServer(app);
