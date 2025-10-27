@@ -42,7 +42,7 @@ export function Contact() {
   const contactInfo = [
     { icon: Phone, label: 'Phone', value: '+91 9886635186', href: 'tel:+919886635186' },
     { icon: Mail, label: 'Email', value: 'claryntia@gmail.com', href: 'mailto:claryntia@gmail.com' },
-    { icon: MapPin, label: 'Location', value: 'Mumbai, India', href: null },
+    { icon: MapPin, label: 'Location', value: 'Bangalore, India', href: null },
   ];
 
   const socials = [

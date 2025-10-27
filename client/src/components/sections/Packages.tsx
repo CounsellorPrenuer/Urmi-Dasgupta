@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Check, ChevronLeft, ChevronRight, Download, Copy } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Copy } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { QRCodeSVG } from 'qrcode.react';
 import type { Package } from '@shared/schema';
@@ -30,7 +30,7 @@ export function Packages() {
     queryKey: ['/api/packages'],
   });
 
-  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+  const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     align: 'start',
     containScroll: 'trimSnaps'
@@ -64,7 +64,7 @@ export function Packages() {
     const upiId = 'joint.arum@okaxis';
     const payeeName = 'Claryntia - Urmi Dasgupta';
     const transactionNote = `Payment for ${packageName}`;
-    
+
     const params = new URLSearchParams({
       pa: upiId,
       pn: payeeName,
@@ -72,7 +72,7 @@ export function Packages() {
       cu: 'INR',
       tn: transactionNote
     });
-    
+
     return `upi://pay?${params.toString()}`;
   };
 
@@ -134,7 +134,7 @@ export function Packages() {
 
       setIsFormDialogOpen(false);
       setIsQRDialogOpen(true);
-      
+
     } catch (error) {
       console.error('Payment error:', error);
       toast({
@@ -155,40 +155,11 @@ export function Packages() {
     });
   };
 
-  const handleDownloadQR = () => {
-    const svg = document.getElementById('upi-qr-code');
-    if (!svg) return;
-    
-    const svgData = new XMLSerializer().serializeToString(svg);
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    
-    img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx?.drawImage(img, 0, 0);
-      const pngFile = canvas.toDataURL('image/png');
-      
-      const downloadLink = document.createElement('a');
-      downloadLink.download = 'claryntia-payment-qr.png';
-      downloadLink.href = pngFile;
-      downloadLink.click();
-      
-      toast({
-        title: "Downloaded!",
-        description: "QR code saved to your device",
-      });
-    };
-    
-    img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
-  };
-
   const handleCloseQRDialog = () => {
     setIsQRDialogOpen(false);
     setCustomerInfo({ name: '', email: '', phone: '' });
     setSelectedPackage(null);
-    
+
     toast({
       title: "Thank you!",
       description: "We've recorded your details. Please complete the payment and we'll contact you shortly.",
@@ -234,7 +205,7 @@ export function Packages() {
                     key={pkg.id}
                     className="flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-12px)] lg:flex-[0_0_calc(33.333%-16px)]"
                   >
-                    <Card 
+                    <Card
                       className="h-full flex flex-col glass-effect border border-card-border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 rounded-3xl"
                       data-testid={`card-package-${index}`}
                     >
@@ -263,7 +234,7 @@ export function Packages() {
                       </CardContent>
 
                       <CardFooter>
-                        <Button 
+                        <Button
                           onClick={() => handleGetStarted(pkg)}
                           className="w-full rounded-full py-6 bg-primary-purple text-white"
                           data-testid={`button-get-started-${index}`}
@@ -437,19 +408,10 @@ export function Packages() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-2 w-full">
-              <Button
-                variant="outline"
-                onClick={handleDownloadQR}
-                className="flex-1 text-sm"
-                data-testid="button-download-qr"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download QR
-              </Button>
+            <div className="flex w-full">
               <Button
                 onClick={handleCloseQRDialog}
-                className="flex-1 bg-primary-purple text-white text-sm"
+                className="w-full bg-primary-purple text-white text-sm"
                 data-testid="button-close-qr"
               >
                 Done
