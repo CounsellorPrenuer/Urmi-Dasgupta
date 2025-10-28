@@ -5,6 +5,8 @@ import connectPgSimple from "connect-pg-simple";
 import { storage } from "./storage";
 import { pool } from "./db";
 import bcrypt from "bcrypt";
+import Razorpay from "razorpay";
+import crypto from "crypto";
 import { 
   insertContactSubmissionSchema,
   insertTestimonialSchema,
