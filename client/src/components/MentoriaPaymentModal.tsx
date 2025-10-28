@@ -155,6 +155,7 @@ export function MentoriaPaymentModal({ open, onOpenChange, package: pkg }: Mento
 
       const paymentObject = new window.Razorpay(options);
       paymentObject.open();
+      onOpenChange(false);
     } catch (error) {
       console.error('Payment error:', error);
       toast({
