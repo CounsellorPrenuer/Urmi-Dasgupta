@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -23,13 +22,15 @@ import {
 import type { PaymentTracking } from "@shared/schema";
 import { format } from "date-fns";
 
-export default function PaymentsAdmin() {
+export default function MentoriaPaymentsAdmin() {
   const { toast } = useToast();
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
   const { data: payments, isLoading } = useQuery<PaymentTracking[]>({
     queryKey: ["/api/payments"],
   });
+
+  const mentoriaPayments = payments?.filter(p => p.razorpayOrderId) || [];
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
@@ -60,14 +61,14 @@ export default function PaymentsAdmin() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold">Payment Tracking</h1>
-        <p className="text-muted-foreground">Monitor payment information before checkout</p>
+        <h1 className="text-2xl md:text-3xl font-bold">Mentoria Payments</h1>
+        <p className="text-muted-foreground">Track Razorpay payments for Mentoria packages</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>All Payment Records</CardTitle>
-          <CardDescription>Total: {payments?.length || 0}</CardDescription>
+          <CardTitle>All Mentoria Payment Records</CardTitle>
+          <CardDescription>Total: {mentoriaPayments.length}</CardDescription>
         </CardHeader>
         <CardContent className="overflow-x-auto">
           <Table>
@@ -83,14 +84,14 @@ export default function PaymentsAdmin() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {!payments || payments.length === 0 ? (
+              {mentoriaPayments.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                    No payment records found
+                    No Mentoria payments found
                   </TableCell>
                 </TableRow>
               ) : (
-                payments.map((payment) => (
+                mentoriaPayments.map((payment) => (
                   <TableRow key={payment.id} data-testid={`row-payment-${payment.id}`}>
                     <TableCell data-testid={`text-name-${payment.id}`}>{payment.name}</TableCell>
                     <TableCell data-testid={`text-email-${payment.id}`} className="max-w-[200px] truncate">{payment.email}</TableCell>
@@ -98,13 +99,15 @@ export default function PaymentsAdmin() {
                     <TableCell data-testid={`text-package-${payment.id}`}>{payment.packageName}</TableCell>
                     <TableCell>
                       <Badge
-                        variant={payment.status === "completed" ? "default" : "outline"}
+                        variant={payment.status === "success" ? "default" : payment.status === "pending" ? "outline" : "destructive"}
                         data-testid={`badge-status-${payment.id}`}
                       >
                         {payment.status}
                       </Badge>
                     </TableCell>
-                    <TableCell data-testid={`text-date-${payment.id}`}>{format(new Date(payment.createdAt), 'MMM d, yyyy')}</TableCell>
+                    <TableCell data-testid={`text-date-${payment.id}`}>
+                      {format(new Date(payment.createdAt), 'MMM d, yyyy')}
+                    </TableCell>
                     <TableCell>
                       <Select
                         value={payment.status}
@@ -119,7 +122,8 @@ export default function PaymentsAdmin() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="completed">Completed</SelectItem>
+                          <SelectItem value="success">Success</SelectItem>
+                          <SelectItem value="failed">Failed</SelectItem>
                           <SelectItem value="cancelled">Cancelled</SelectItem>
                         </SelectContent>
                       </Select>

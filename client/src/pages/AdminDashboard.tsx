@@ -31,6 +31,7 @@ import PackagesAdmin from "./admin/PackagesAdmin";
 import MentoriaPackagesAdmin from "./admin/MentoriaPackagesAdmin";
 import ContactSubmissionsAdmin from "./admin/ContactSubmissionsAdmin";
 import PaymentsAdmin from "./admin/PaymentsAdmin";
+import MentoriaPaymentsAdmin from "./admin/MentoriaPaymentsAdmin";
 
 const menuItems = [
   {
@@ -61,6 +62,11 @@ const menuItems = [
   {
     title: "Payment Tracking",
     url: "/admin/dashboard/payments",
+    icon: CreditCard,
+  },
+  {
+    title: "Mentoria Payments",
+    url: "/admin/dashboard/mentoria-payments",
     icon: CreditCard,
   },
 ];
@@ -159,7 +165,7 @@ export default function AdminDashboard() {
     <SidebarProvider>
       <div className="flex h-screen w-full">
         <AdminSidebar />
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-auto p-4 md:p-6">
           <Switch>
             <Route path="/admin/dashboard/testimonials" component={TestimonialsAdmin} />
             <Route path="/admin/dashboard/blogs" component={BlogsAdmin} />
@@ -167,9 +173,10 @@ export default function AdminDashboard() {
             <Route path="/admin/dashboard/mentoria-packages" component={MentoriaPackagesAdmin} />
             <Route path="/admin/dashboard/contacts" component={ContactSubmissionsAdmin} />
             <Route path="/admin/dashboard/payments" component={PaymentsAdmin} />
+            <Route path="/admin/dashboard/mentoria-payments" component={MentoriaPaymentsAdmin} />
             <Route>
-              <div className="text-center">
-                <h1 className="text-3xl font-bold mb-4">Welcome to Admin Dashboard</h1>
+              <div className="text-center px-4">
+                <h1 className="text-2xl md:text-3xl font-bold mb-4">Welcome to Admin Dashboard</h1>
                 <p className="text-muted-foreground">
                   Select an option from the sidebar to get started
                 </p>
