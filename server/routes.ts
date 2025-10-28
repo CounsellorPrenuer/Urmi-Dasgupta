@@ -457,7 +457,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const options = {
         amount: pkg.price * 100,
         currency: "INR",
-        receipt: `mentoria_${packageId}_${Date.now()}`,
+        receipt: `M${Date.now().toString().slice(-10)}${Math.random().toString(36).slice(-6)}`,
         notes: {
           packageId: pkg.id,
           packageName: pkg.name,
