@@ -33,8 +33,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload } from "lucide-react";
 import type { Blog } from "@shared/schema";
+import { ObjectUploader } from "@/components/ObjectUploader";
+import type { UploadResult } from "@uppy/core";
 
 const blogSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -138,6 +140,31 @@ export default function BlogsAdmin() {
     }
   };
 
+  const handleGetUploadParameters = async () => {
+    const response = await apiRequest("POST", "/api/objects/upload", {});
+    const data = await response.json();
+    return {
+      method: "PUT" as const,
+      url: data.uploadURL,
+    };
+  };
+
+  const handleUploadComplete = async (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+    if (result.successful && result.successful.length > 0) {
+      const uploadURL = result.successful[0].uploadURL;
+      
+      // Set ACL policy for the uploaded image
+      const response = await apiRequest("PUT", "/api/blog-images", {
+        imageURL: uploadURL,
+      });
+      const data = await response.json();
+      
+      // Update the form with the object path
+      form.setValue("imageUrl", data.objectPath);
+      toast({ title: "Image uploaded successfully" });
+    }
+  };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -226,12 +253,25 @@ export default function BlogsAdmin() {
                     <FormItem>
                       <FormLabel>Image URL (Optional)</FormLabel>
                       <FormControl>
-                        <Input placeholder="https://example.com/image.jpg" data-testid="input-imageurl" {...field} />
+                        <Input placeholder="https://example.com/image.jpg or upload below" data-testid="input-imageurl" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">or</span>
+                  <ObjectUploader
+                    maxNumberOfFiles={1}
+                    maxFileSize={10485760}
+                    onGetUploadParameters={handleGetUploadParameters}
+                    onComplete={handleUploadComplete}
+                    buttonVariant="outline"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Upload Image from Device
+                  </ObjectUploader>
+                </div>
                 <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending} data-testid="button-submit-blog">
                   {editingBlog ? "Update" : "Create"}
                 </Button>
