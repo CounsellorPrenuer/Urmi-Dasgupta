@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
@@ -15,6 +16,14 @@ const discoveryCallFormSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   phone: z.string().min(10, 'Please enter a valid phone number'),
   background: z.string().min(1, 'Please select your background'),
+  briefMessage: z.string()
+    .optional()
+    .refine((val) => {
+      if (!val || val.trim() === '') return true;
+      const wordCount = val.trim().split(/\s+/).length;
+      return wordCount <= 500;
+    }, { message: 'Brief message cannot exceed 500 words' })
+    .or(z.literal('')),
 });
 
 type DiscoveryCallFormValues = z.infer<typeof discoveryCallFormSchema>;
@@ -61,6 +70,7 @@ export function FreeDiscoveryCallModal({ open, onOpenChange }: FreeDiscoveryCall
       name: '',
       phone: '',
       background: '',
+      briefMessage: '',
     },
   });
 
@@ -79,6 +89,7 @@ export function FreeDiscoveryCallModal({ open, onOpenChange }: FreeDiscoveryCall
           email: '',
           purpose: 'Free Discovery Call',
           message: `Background: ${data.background}`,
+          briefMessage: data.briefMessage || '',
         }),
       });
 
@@ -234,6 +245,31 @@ export function FreeDiscoveryCallModal({ open, onOpenChange }: FreeDiscoveryCall
                     <FormMessage />
                   </FormItem>
                 )}
+              />
+
+              <FormField
+                control={form.control}
+                name="briefMessage"
+                render={({ field }) => {
+                  const wordCount = field.value ? field.value.trim().split(/\s+/).filter(word => word.length > 0).length : 0;
+                  return (
+                    <FormItem>
+                      <FormLabel>Brief Message (Optional - Max 500 words)</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Share a brief summary of your situation..."
+                          className="min-h-[100px] resize-y"
+                          {...field}
+                          data-testid="textarea-brief-message"
+                        />
+                      </FormControl>
+                      <div className="text-xs text-muted-foreground text-right">
+                        {wordCount}/500 words
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
 
               <Button

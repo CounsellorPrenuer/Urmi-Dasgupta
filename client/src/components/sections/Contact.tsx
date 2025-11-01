@@ -20,14 +20,6 @@ const contactFormSchema = z.object({
   phone: z.string().min(10, 'Please enter a valid phone number'),
   purpose: z.string().min(1, 'Please select a purpose'),
   message: z.string().min(10, 'Message must be at least 10 characters'),
-  briefMessage: z.string()
-    .optional()
-    .refine((val) => {
-      if (!val || val.trim() === '') return true;
-      const wordCount = val.trim().split(/\s+/).length;
-      return wordCount <= 500;
-    }, { message: 'Brief message cannot exceed 500 words' })
-    .or(z.literal('')),
 });
 
 type ContactFormValues = z.infer<typeof contactFormSchema>;
@@ -45,7 +37,6 @@ export function Contact() {
       phone: '',
       purpose: '',
       message: '',
-      briefMessage: '',
     },
   });
 
@@ -234,31 +225,6 @@ export function Contact() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="briefMessage"
-                    render={({ field }) => {
-                      const wordCount = field.value ? field.value.trim().split(/\s+/).filter(word => word.length > 0).length : 0;
-                      return (
-                        <FormItem>
-                          <FormLabel>Brief Message (Optional - Max 500 words)</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="Share a brief summary of your situation..."
-                              className="min-h-[100px] resize-y"
-                              {...field}
-                              data-testid="textarea-brief-message"
-                            />
-                          </FormControl>
-                          <div className="text-xs text-muted-foreground text-right">
-                            {wordCount}/500 words
-                          </div>
-                          <FormMessage />
-                        </FormItem>
-                      );
-                    }}
                   />
 
                   <Button
