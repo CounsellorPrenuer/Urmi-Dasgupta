@@ -47,8 +47,8 @@ export function Navbar() {
       transition={{ duration: 0.6 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-gray-900/95 backdrop-blur-lg shadow-lg border-b border-gray-800'
-          : 'bg-gray-900'
+          ? 'bg-white/10 backdrop-blur-lg shadow-lg border-b border-white/20'
+          : 'bg-transparent'
       }`}
       data-testid="nav-main"
     >
@@ -72,7 +72,7 @@ export function Navbar() {
               className="w-12 h-12 object-contain transition-transform group-hover:rotate-6"
               data-testid="img-nav-logo"
             />
-            <span className="font-serif text-2xl font-bold bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent">
+            <span className="font-serif text-2xl font-bold text-white">
               Claryntia
             </span>
           </motion.a>
@@ -170,7 +170,7 @@ export function Navbar() {
               >
                 <Button
                   size="default"
-                  className="w-full bg-gradient-to-r from-white to-blue-50 text-primary hover:from-white/90 hover:to-blue-50/90 rounded-full"
+                  className="w-full bg-gradient-to-r from-accent-orange via-orange-500 to-orange-600 hover:from-orange-600 hover:via-orange-500 hover:to-accent-orange text-white rounded-full"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     setIsModalOpen(true);
