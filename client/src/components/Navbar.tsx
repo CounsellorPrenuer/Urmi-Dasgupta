@@ -15,11 +15,17 @@ const navLinks = [
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isPastHero, setIsPastHero] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
+      const heroSection = document.querySelector('#hero');
+      if (heroSection) {
+        const heroBottom = heroSection.getBoundingClientRect().bottom;
+        setIsPastHero(heroBottom <= 80);
+      }
       setIsScrolled(window.scrollY > 50);
     };
 
@@ -46,8 +52,8 @@ export function Navbar() {
       animate={{ y: 0 }}
       transition={{ duration: 0.6 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? 'bg-white/10 backdrop-blur-lg shadow-lg border-b border-white/20'
+        isPastHero
+          ? 'bg-black shadow-lg border-b border-gray-800'
           : 'bg-transparent'
       }`}
       data-testid="nav-main"
@@ -72,7 +78,7 @@ export function Navbar() {
               className="w-12 h-12 object-contain transition-transform group-hover:rotate-6"
               data-testid="img-nav-logo"
             />
-            <span className="font-serif text-2xl font-bold text-white">
+            <span className={`font-serif text-2xl font-bold transition-colors duration-300 ${isPastHero ? 'text-primary-purple' : 'text-white'}`}>
               Claryntia
             </span>
           </motion.a>
