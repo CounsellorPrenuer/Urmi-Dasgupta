@@ -108,7 +108,7 @@ export function Navbar() {
           >
             <Button
               size="default"
-              className="bg-gradient-to-r from-white to-blue-50 text-primary hover:from-white/90 hover:to-blue-50/90 rounded-full px-6"
+              className="bg-gradient-to-r from-accent-orange via-orange-500 to-orange-600 hover:from-orange-600 hover:via-orange-500 hover:to-accent-orange text-white rounded-full px-6"
               onClick={() => setIsModalOpen(true)}
               data-testid="button-nav-cta"
             >

@@ -38,7 +38,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="font-serif text-5xl md:text-7xl font-bold mb-6 text-accent-orange"
+          className="font-serif text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-accent-orange via-orange-500 to-orange-600 bg-clip-text text-transparent"
           data-testid="text-hero-title"
         >
           Aligning Ambition with Clarity
@@ -72,7 +72,7 @@ export function Hero() {
         >
           <Button 
             size="lg" 
-            className="bg-accent-orange hover:bg-accent-orange/90 text-white px-8 py-6 text-lg rounded-full group shadow-xl"
+            className="bg-gradient-to-r from-accent-orange via-orange-500 to-orange-600 hover:from-orange-600 hover:via-orange-500 hover:to-accent-orange text-white px-8 py-6 text-lg rounded-full group shadow-xl"
             data-testid="button-free-call"
             onClick={() => setIsModalOpen(true)}
           >
