@@ -19,76 +19,82 @@ export function Hero() {
     <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-primary-purple via-purple-700 to-purple-900">
       <div className="absolute inset-0 bg-gradient-to-br from-primary-purple/80 via-purple-700/80 to-purple-900/80" />
       
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="mb-8"
-        >
-          <img 
-            src={logoImg} 
-            alt="Claryntia Logo" 
-            className="w-32 h-32 mx-auto mb-8"
-            data-testid="img-logo"
-          />
-        </motion.div>
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left Side - Text Content */}
+          <div className="text-left">
+            <motion.h1
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-accent-orange via-orange-500 to-orange-600 bg-clip-text text-transparent"
+              data-testid="text-hero-title"
+            >
+              Aligning Ambition with Clarity
+            </motion.h1>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="font-serif text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-accent-orange via-orange-500 to-orange-600 bg-clip-text text-transparent"
-          data-testid="text-hero-title"
-        >
-          Aligning Ambition with Clarity
-        </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-xl md:text-2xl text-white mb-4 font-medium"
+              data-testid="text-hero-subtitle"
+            >
+              Empowering Minds. Healing Hearts. Redefining Possibilities.
+            </motion.p>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-xl md:text-2xl text-white mb-4 max-w-3xl mx-auto font-medium"
-          data-testid="text-hero-subtitle"
-        >
-          Empowering Minds. Healing Hearts. Redefining Possibilities.
-        </motion.p>
+            <motion.p
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="text-lg text-white/90 mb-8"
+              data-testid="text-hero-description"
+            >
+              Helping students, professionals, and organizations achieve harmony between career success and emotional well-being in today's fast-evolving world.
+            </motion.p>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          className="text-lg text-white/90 mb-12 max-w-4xl mx-auto"
-          data-testid="text-hero-description"
-        >
-          Helping students, professionals, and organizations achieve harmony between career success and emotional well-being in today's fast-evolving world.
-        </motion.p>
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="flex flex-col sm:flex-row gap-4"
+            >
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-accent-orange via-orange-500 to-orange-600 hover:from-orange-600 hover:via-orange-500 hover:to-accent-orange text-white px-8 py-6 text-lg rounded-full group shadow-xl"
+                data-testid="button-free-call"
+                onClick={() => setIsModalOpen(true)}
+              >
+                Free Clarity Discovery Call
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="px-8 py-6 text-lg rounded-full border-2 border-white text-white hover:bg-white hover:text-primary-purple transition-colors"
+                data-testid="button-learn-more"
+                onClick={() => scrollToSection('#who-we-help')}
+              >
+                Learn More
+              </Button>
+            </motion.div>
+          </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-        >
-          <Button 
-            size="lg" 
-            className="bg-gradient-to-r from-accent-orange via-orange-500 to-orange-600 hover:from-orange-600 hover:via-orange-500 hover:to-accent-orange text-white px-8 py-6 text-lg rounded-full group shadow-xl"
-            data-testid="button-free-call"
-            onClick={() => setIsModalOpen(true)}
+          {/* Right Side - Logo */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="flex justify-center lg:justify-end"
           >
-            Free Clarity Discovery Call
-            <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </Button>
-          <Button 
-            size="lg" 
-            variant="outline" 
-            className="px-8 py-6 text-lg rounded-full border-2 border-white text-white hover:bg-white hover:text-primary-purple transition-colors"
-            data-testid="button-learn-more"
-            onClick={() => scrollToSection('#who-we-help')}
-          >
-            Learn More
-          </Button>
-        </motion.div>
+            <img 
+              src={logoImg} 
+              alt="Claryntia Logo" 
+              className="w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 object-contain"
+              data-testid="img-logo"
+            />
+          </motion.div>
+        </div>
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
