@@ -126,7 +126,7 @@ export function Blog() {
                             <span>{post.author}</span>
                           </div>
                         )}
-                        <CardTitle className="font-serif text-xl group-hover:text-primary-purple transition-colors">
+                        <CardTitle className="font-serif text-xl text-primary-purple transition-colors">
                           {post.title}
                         </CardTitle>
                       </CardHeader>
