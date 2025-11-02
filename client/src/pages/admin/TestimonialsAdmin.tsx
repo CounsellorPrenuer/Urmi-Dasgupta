@@ -138,10 +138,10 @@ export default function TestimonialsAdmin() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Testimonials</h1>
-          <p className="text-muted-foreground">Manage customer testimonials</p>
+          <h1 className="text-2xl md:text-3xl font-bold">Testimonials</h1>
+          <p className="text-sm md:text-base text-muted-foreground">Manage customer testimonials</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
           <DialogTrigger asChild>
@@ -150,7 +150,7 @@ export default function TestimonialsAdmin() {
               Add Testimonial
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingTestimonial ? "Edit Testimonial" : "Add Testimonial"}
@@ -211,17 +211,17 @@ export default function TestimonialsAdmin() {
 
       <Card>
         <CardHeader>
-          <CardTitle>All Testimonials</CardTitle>
+          <CardTitle className="text-lg md:text-xl">All Testimonials</CardTitle>
           <CardDescription>Total: {testimonials?.length || 0}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Content</TableHead>
-                <TableHead>Rating</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="min-w-[120px]">Name</TableHead>
+                <TableHead className="min-w-[250px]">Content</TableHead>
+                <TableHead className="min-w-[100px]">Rating</TableHead>
+                <TableHead className="min-w-[120px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -237,7 +237,7 @@ export default function TestimonialsAdmin() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 whitespace-nowrap">
                       <Button
                         size="sm"
                         variant="outline"
@@ -245,6 +245,7 @@ export default function TestimonialsAdmin() {
                         data-testid={`button-edit-${testimonial.id}`}
                       >
                         <Pencil className="w-4 h-4" />
+                        <span className="sr-only">Edit</span>
                       </Button>
                       <Button
                         size="sm"
@@ -253,6 +254,7 @@ export default function TestimonialsAdmin() {
                         data-testid={`button-delete-${testimonial.id}`}
                       >
                         <Trash2 className="w-4 h-4" />
+                        <span className="sr-only">Delete</span>
                       </Button>
                     </div>
                   </TableCell>

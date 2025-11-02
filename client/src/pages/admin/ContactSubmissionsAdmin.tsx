@@ -28,34 +28,35 @@ export default function ContactSubmissionsAdmin() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6 p-4 md:p-6">
       <div>
-        <h1 className="text-3xl font-bold">Contact Submissions</h1>
-        <p className="text-muted-foreground">View all contact form submissions</p>
+        <h1 className="text-2xl md:text-3xl font-bold">Contact Submissions</h1>
+        <p className="text-sm md:text-base text-muted-foreground">View all contact form submissions</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>All Submissions</CardTitle>
+          <CardTitle className="text-lg md:text-xl">All Submissions</CardTitle>
           <CardDescription>Total: {submissions?.length || 0}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Purpose</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="min-w-[120px]">Name</TableHead>
+                <TableHead className="min-w-[180px]">Email</TableHead>
+                <TableHead className="min-w-[120px]">Phone</TableHead>
+                <TableHead className="min-w-[140px]">Purpose</TableHead>
+                <TableHead className="min-w-[100px]">Date</TableHead>
+                <TableHead className="min-w-[100px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {submissions?.map((submission) => (
                 <TableRow key={submission.id} data-testid={`row-contact-${submission.id}`}>
                   <TableCell data-testid={`text-name-${submission.id}`}>{submission.name}</TableCell>
-                  <TableCell data-testid={`text-email-${submission.id}`}>{submission.email}</TableCell>
+                  <TableCell data-testid={`text-email-${submission.id}`} className="max-w-[200px] truncate">{submission.email}</TableCell>
+
                   <TableCell data-testid={`text-phone-${submission.id}`}>{submission.phone}</TableCell>
                   <TableCell>
                     <Badge variant="outline" data-testid={`badge-purpose-${submission.id}`}>{submission.purpose}</Badge>
@@ -67,9 +68,10 @@ export default function ContactSubmissionsAdmin() {
                       variant="outline"
                       onClick={() => setSelectedSubmission(submission)}
                       data-testid={`button-view-${submission.id}`}
+                      className="whitespace-nowrap"
                     >
-                      <Eye className="w-4 h-4 mr-2" />
-                      View
+                      <Eye className="w-4 h-4 md:mr-2" />
+                      <span className="hidden md:inline">View</span>
                     </Button>
                   </TableCell>
                 </TableRow>

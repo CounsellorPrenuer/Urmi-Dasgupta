@@ -59,15 +59,15 @@ export default function MentoriaPaymentsAdmin() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6 p-4 md:p-6">
       <div>
         <h1 className="text-2xl md:text-3xl font-bold">Mentoria Payments</h1>
-        <p className="text-muted-foreground">Track Razorpay payments for Mentoria packages</p>
+        <p className="text-sm md:text-base text-muted-foreground">Track Razorpay payments for Mentoria packages</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>All Mentoria Payment Records</CardTitle>
+          <CardTitle className="text-lg md:text-xl">All Mentoria Payment Records</CardTitle>
           <CardDescription>Total: {mentoriaPayments.length}</CardDescription>
         </CardHeader>
         <CardContent className="overflow-x-auto">

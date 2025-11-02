@@ -146,10 +146,10 @@ export default function PackagesAdmin() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Packages</h1>
-          <p className="text-muted-foreground">Manage service packages</p>
+          <h1 className="text-2xl md:text-3xl font-bold">Packages</h1>
+          <p className="text-sm md:text-base text-muted-foreground">Manage service packages</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
           <DialogTrigger asChild>
@@ -245,18 +245,18 @@ export default function PackagesAdmin() {
 
       <Card>
         <CardHeader>
-          <CardTitle>All Packages</CardTitle>
+          <CardTitle className="text-lg md:text-xl">All Packages</CardTitle>
           <CardDescription>Total: {packages?.length || 0}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Duration</TableHead>
-                <TableHead>Features</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="min-w-[150px]">Name</TableHead>
+                <TableHead className="min-w-[100px]">Price</TableHead>
+                <TableHead className="min-w-[120px]">Duration</TableHead>
+                <TableHead className="min-w-[200px]">Features</TableHead>
+                <TableHead className="min-w-[120px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -269,7 +269,7 @@ export default function PackagesAdmin() {
                     <div className="truncate">{pkg.features.join(', ')}</div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 whitespace-nowrap">
                       <Button
                         size="sm"
                         variant="outline"
@@ -277,6 +277,7 @@ export default function PackagesAdmin() {
                         data-testid={`button-edit-${pkg.id}`}
                       >
                         <Pencil className="w-4 h-4" />
+                        <span className="sr-only">Edit</span>
                       </Button>
                       <Button
                         size="sm"
@@ -285,6 +286,7 @@ export default function PackagesAdmin() {
                         data-testid={`button-delete-${pkg.id}`}
                       >
                         <Trash2 className="w-4 h-4" />
+                        <span className="sr-only">Delete</span>
                       </Button>
                     </div>
                   </TableCell>

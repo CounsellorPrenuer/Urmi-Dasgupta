@@ -161,11 +161,11 @@ export default function MentoriaPackagesAdmin() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 md:space-y-6 p-4 md:p-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Mentoria Packages</h1>
-          <p className="text-muted-foreground">Manage Mentoria career guidance packages</p>
+          <h1 className="text-2xl md:text-3xl font-bold">Mentoria Packages</h1>
+          <p className="text-sm md:text-base text-muted-foreground">Manage Mentoria career guidance packages</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
           <DialogTrigger asChild>
@@ -348,16 +348,16 @@ export default function MentoriaPackagesAdmin() {
       </div>
 
       <Card>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Features</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="min-w-[180px]">Name</TableHead>
+                <TableHead className="min-w-[120px]">Category</TableHead>
+                <TableHead className="min-w-[100px]">Price</TableHead>
+                <TableHead className="min-w-[100px]">Status</TableHead>
+                <TableHead className="min-w-[100px]">Features</TableHead>
+                <TableHead className="text-right min-w-[120px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -394,7 +394,7 @@ export default function MentoriaPackagesAdmin() {
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-end gap-2 whitespace-nowrap">
                       <Button
                         variant="ghost"
                         size="icon"
@@ -402,6 +402,7 @@ export default function MentoriaPackagesAdmin() {
                         data-testid={`button-edit-${pkg.id}`}
                       >
                         <Pencil className="w-4 h-4" />
+                        <span className="sr-only">Edit</span>
                       </Button>
                       <Button
                         variant="ghost"
@@ -410,6 +411,7 @@ export default function MentoriaPackagesAdmin() {
                         data-testid={`button-delete-${pkg.id}`}
                       >
                         <Trash2 className="w-4 h-4" />
+                        <span className="sr-only">Delete</span>
                       </Button>
                     </div>
                   </TableCell>

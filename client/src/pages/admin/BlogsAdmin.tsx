@@ -170,10 +170,10 @@ export default function BlogsAdmin() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Blogs</h1>
-          <p className="text-muted-foreground">Manage blog posts</p>
+          <h1 className="text-2xl md:text-3xl font-bold">Blogs</h1>
+          <p className="text-sm md:text-base text-muted-foreground">Manage blog posts</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
           <DialogTrigger asChild>
@@ -318,17 +318,17 @@ export default function BlogsAdmin() {
 
       <Card>
         <CardHeader>
-          <CardTitle>All Blogs</CardTitle>
+          <CardTitle className="text-lg md:text-xl">All Blogs</CardTitle>
           <CardDescription>Total: {blogs?.length || 0}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Author</TableHead>
-                <TableHead>Excerpt</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="min-w-[180px]">Title</TableHead>
+                <TableHead className="min-w-[120px]">Author</TableHead>
+                <TableHead className="min-w-[250px]">Excerpt</TableHead>
+                <TableHead className="min-w-[120px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -338,7 +338,7 @@ export default function BlogsAdmin() {
                   <TableCell>{blog.author}</TableCell>
                   <TableCell className="max-w-md truncate">{blog.excerpt}</TableCell>
                   <TableCell>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 whitespace-nowrap">
                       <Button
                         size="sm"
                         variant="outline"
@@ -346,6 +346,7 @@ export default function BlogsAdmin() {
                         data-testid={`button-edit-${blog.id}`}
                       >
                         <Pencil className="w-4 h-4" />
+                        <span className="sr-only">Edit</span>
                       </Button>
                       <Button
                         size="sm"
@@ -354,6 +355,7 @@ export default function BlogsAdmin() {
                         data-testid={`button-delete-${blog.id}`}
                       >
                         <Trash2 className="w-4 h-4" />
+                        <span className="sr-only">Delete</span>
                       </Button>
                     </div>
                   </TableCell>
