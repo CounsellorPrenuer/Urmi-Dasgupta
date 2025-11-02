@@ -16,8 +16,8 @@ export function Hero() {
   };
 
   return (
-    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-primary-purple via-purple-700 to-purple-900">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary-purple/80 via-purple-700/80 to-purple-900/80" />
+    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-purple-900 via-purple-950 to-slate-900">
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/90 via-purple-950/90 to-slate-900/90" />
       
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -27,7 +27,7 @@ export function Hero() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-serif text-4xl md:text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-accent-orange via-orange-500 to-orange-600 bg-clip-text text-transparent"
+              className="font-serif text-4xl md:text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent"
               data-testid="text-hero-title"
             >
               Aligning Ambition with Inner Clarity
@@ -61,7 +61,7 @@ export function Hero() {
             >
               <Button 
                 size="lg" 
-                className="bg-gradient-to-r from-accent-orange via-orange-500 to-orange-600 hover:from-orange-600 hover:via-orange-500 hover:to-accent-orange text-white px-8 py-6 text-lg rounded-full group shadow-xl"
+                className="bg-gradient-to-r from-orange-600 via-orange-700 to-orange-800 hover:from-orange-700 hover:via-orange-800 hover:to-orange-900 text-white px-8 py-6 text-lg rounded-full group shadow-xl"
                 data-testid="button-free-call"
                 onClick={() => setIsModalOpen(true)}
               >
