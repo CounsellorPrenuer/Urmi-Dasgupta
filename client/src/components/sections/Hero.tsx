@@ -100,19 +100,11 @@ export function Hero() {
             }}
             className="flex justify-center"
           >
-            <motion.img 
+            <img 
               src={logoImg} 
               alt="Claryntia Logo" 
               className="w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 object-contain"
               data-testid="img-logo"
-              animate={{
-                rotate: [0, 5, 0, -5, 0]
-              }}
-              transition={{
-                duration: 6,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
             />
           </motion.div>
         </div>
