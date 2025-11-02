@@ -87,7 +87,8 @@ export function FreeDiscoveryCallModal({ open, onOpenChange }: FreeDiscoveryCall
           email: data.email,
           phone: data.phone,
           purpose: 'Free Discovery Call',
-          message: `Background: ${data.background}${data.briefMessage ? `\n\nBrief Message: ${data.briefMessage}` : ''}`,
+          message: `Background: ${data.background}`,
+          briefMessage: data.briefMessage || null,
         }),
       });
 
