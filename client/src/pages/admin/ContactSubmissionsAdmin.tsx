@@ -80,27 +80,27 @@ export default function ContactSubmissionsAdmin() {
       </Card>
 
       <Dialog open={!!selectedSubmission} onOpenChange={() => setSelectedSubmission(null)}>
-        <DialogContent className="max-w-2xl" data-testid="modal-submission-details">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" data-testid="modal-submission-details">
           <DialogHeader>
             <DialogTitle>Submission Details</DialogTitle>
           </DialogHeader>
           
           {selectedSubmission && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-semibold text-muted-foreground">Name</label>
-                  <p className="text-base" data-testid="detail-name">{selectedSubmission.name}</p>
+                  <p className="text-base break-words" data-testid="detail-name">{selectedSubmission.name}</p>
                 </div>
                 
                 <div>
                   <label className="text-sm font-semibold text-muted-foreground">Email</label>
-                  <p className="text-base" data-testid="detail-email">{selectedSubmission.email}</p>
+                  <p className="text-base break-all" data-testid="detail-email">{selectedSubmission.email}</p>
                 </div>
                 
                 <div>
                   <label className="text-sm font-semibold text-muted-foreground">Phone</label>
-                  <p className="text-base" data-testid="detail-phone">{selectedSubmission.phone}</p>
+                  <p className="text-base break-words" data-testid="detail-phone">{selectedSubmission.phone}</p>
                 </div>
                 
                 <div>
@@ -110,7 +110,7 @@ export default function ContactSubmissionsAdmin() {
                   </div>
                 </div>
                 
-                <div>
+                <div className="md:col-span-2">
                   <label className="text-sm font-semibold text-muted-foreground">Date</label>
                   <p className="text-base" data-testid="detail-date">
                     {format(new Date(selectedSubmission.createdAt), 'MMMM d, yyyy h:mm a')}
@@ -120,7 +120,7 @@ export default function ContactSubmissionsAdmin() {
               
               <div>
                 <label className="text-sm font-semibold text-muted-foreground">Message</label>
-                <p className="text-base mt-1 p-3 bg-muted rounded-md" data-testid="detail-message">
+                <p className="text-base mt-1 p-3 bg-muted rounded-md break-words whitespace-pre-wrap" data-testid="detail-message">
                   {selectedSubmission.message}
                 </p>
               </div>
@@ -128,9 +128,11 @@ export default function ContactSubmissionsAdmin() {
               {selectedSubmission.briefMessage && (
                 <div>
                   <label className="text-sm font-semibold text-muted-foreground">Brief Message / Description</label>
-                  <p className="text-base mt-1 p-3 bg-muted rounded-md whitespace-pre-wrap" data-testid="detail-brief-message">
-                    {selectedSubmission.briefMessage}
-                  </p>
+                  <div className="mt-1 p-3 bg-muted rounded-md max-h-60 overflow-y-auto">
+                    <p className="text-base break-words whitespace-pre-wrap" data-testid="detail-brief-message">
+                      {selectedSubmission.briefMessage}
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
