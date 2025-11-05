@@ -3,7 +3,7 @@ import { Heart } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="bg-gradient-to-br from-primary-purple to-secondary-blue text-white py-12">
+    <footer className="bg-primary-purple text-white py-12">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-8">
           <div>

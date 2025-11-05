@@ -230,7 +230,7 @@ export function Contact() {
                   <Button
                     type="submit"
                     size="lg"
-                    className="w-full bg-gradient-to-r from-primary-purple to-secondary-blue text-white rounded-full"
+                    className="w-full bg-primary-purple text-white rounded-full"
                     disabled={isSubmitting}
                     data-testid="button-submit-form"
                   >

@@ -79,14 +79,14 @@ export function MentoriaPackages() {
           ))}
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="flex flex-wrap justify-center gap-6">
           {filteredPackages.map((pkg, index) => (
             <motion.div
               key={pkg.id}
               initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="h-full"
+              className="w-full md:max-w-[calc(50%_-_0.75rem)] lg:max-w-[calc(33.333%_-_1rem)]"
             >
               <Card 
                 className={`h-full glass-effect shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:bg-emerald-50/30 rounded-2xl flex flex-col ${
@@ -133,7 +133,7 @@ export function MentoriaPackages() {
                 <CardFooter>
                   <Button
                     size="lg"
-                    className="w-full bg-gradient-to-r from-primary-purple to-secondary-blue text-white rounded-full"
+                    className="w-full bg-primary-purple text-white rounded-full"
                     onClick={() => handleBookNow(pkg)}
                     data-testid={`button-book-${pkg.id}`}
                   >
