@@ -27,10 +27,10 @@ export function Hero() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-serif text-5xl md:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent"
+              className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent lg:whitespace-nowrap"
               data-testid="text-hero-title"
             >
-              Aligning Ambition with Inner Clarity
+              Align Ambition with Clarity
             </motion.h1>
 
             <motion.p
@@ -98,12 +98,13 @@ export function Hero() {
                 delay: 0.3
               }
             }}
-            className="flex justify-center"
+            className="flex justify-center relative group"
           >
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/0 via-emerald-500/0 to-emerald-600/0 group-hover:from-emerald-400/30 group-hover:via-emerald-500/40 group-hover:to-emerald-600/30 rounded-full blur-3xl transition-all duration-500" />
             <img 
               src={logoImg} 
               alt="Claryntia Logo" 
-              className="w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 object-contain"
+              className="w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 object-contain relative z-10"
               data-testid="img-logo"
             />
           </motion.div>

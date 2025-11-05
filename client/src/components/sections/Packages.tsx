@@ -32,7 +32,7 @@ export function Packages() {
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
-    align: 'start',
+    align: 'center',
     containScroll: 'trimSnaps'
   });
 
