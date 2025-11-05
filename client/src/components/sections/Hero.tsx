@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
-import logoImg from '@assets/Screenshot_2025-10-04_122812-removebg-preview_1759562746476.png';
+import logoImg from '@assets/generated-image(1)_1762374279351.png';
 import { FreeDiscoveryCallModal } from '@/components/FreeDiscoveryCallModal';
 
 export function Hero() {
