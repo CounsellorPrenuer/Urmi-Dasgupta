@@ -9,28 +9,32 @@ const steps = [
     number: '01',
     title: 'Discover your inner clarity',
     description: 'Through psychometric and energy analysis',
-    color: 'from-primary-purple to-secondary-blue',
+    iconColor: 'text-secondary-blue',
+    numberGradient: 'from-primary-purple to-secondary-blue',
   },
   {
     icon: Lightbulb,
     number: '02',
     title: 'Reprogram subconscious limitations',
     description: 'Using proven techniques like EFT, Ho\'oponopono, and Hypnotherapy',
-    color: 'from-secondary-blue to-accent-orange',
+    iconColor: 'text-accent-orange',
+    numberGradient: 'from-secondary-blue to-accent-orange',
   },
   {
     icon: Target,
     number: '03',
     title: 'Build emotional and professional harmony',
     description: 'Align goals, relationships, and energy fields',
-    color: 'from-accent-orange to-primary-purple',
+    iconColor: 'text-primary-purple',
+    numberGradient: 'from-accent-orange to-primary-purple',
   },
   {
     icon: TrendingUp,
     number: '04',
     title: 'Create sustainable transformation',
     description: 'Personalized action plans + continuous mentorship',
-    color: 'from-primary-purple to-secondary-blue',
+    iconColor: 'text-rose-500',
+    numberGradient: 'from-primary-purple to-secondary-blue',
   },
 ];
 
@@ -64,11 +68,11 @@ export function Methodology() {
               className="relative"
             >
               <Card className="glass-effect border border-card-border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:bg-emerald-50/30 rounded-2xl p-8 h-full cursor-default" data-testid={`card-step-${index}`}>
-                <div className={`text-6xl font-serif font-bold bg-gradient-to-r ${step.color} bg-clip-text text-transparent mb-6`}>
+                <div className={`text-6xl font-serif font-bold bg-gradient-to-r ${step.numberGradient} bg-clip-text text-transparent mb-6`}>
                   {step.number}
                 </div>
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center mb-6">
-                  <step.icon className="w-7 h-7 text-emerald-600" />
+                  <step.icon className={`w-7 h-7 ${step.iconColor}`} />
                 </div>
                 <h3 className="font-serif text-xl font-semibold mb-3">{step.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>

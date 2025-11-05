@@ -41,9 +41,9 @@ export function Contact() {
   });
 
   const contactInfo = [
-    { icon: Phone, label: 'Phone', value: '+91 9886635186', href: 'tel:+919886635186' },
-    { icon: Mail, label: 'Email', value: 'claryntia@gmail.com', href: 'mailto:claryntia@gmail.com' },
-    { icon: MapPin, label: 'Location', value: 'Bangalore, India', href: null },
+    { icon: Phone, label: 'Phone', value: '+91 9886635186', href: 'tel:+919886635186', iconColor: 'text-secondary-blue' },
+    { icon: Mail, label: 'Email', value: 'claryntia@gmail.com', href: 'mailto:claryntia@gmail.com', iconColor: 'text-accent-orange' },
+    { icon: MapPin, label: 'Location', value: 'Bangalore, India', href: null, iconColor: 'text-primary-purple' },
   ];
 
   const socials = [
@@ -266,7 +266,7 @@ export function Contact() {
                   <Card className="glass-effect border border-card-border shadow-lg p-6 rounded-2xl hover:shadow-xl hover:bg-emerald-50/30 transition-all" data-testid={`contact-${info.label.toLowerCase()}`}>
                     <div className="flex items-center gap-4">
                       <div className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center flex-shrink-0">
-                        <info.icon className="w-7 h-7 text-emerald-600" />
+                        <info.icon className={`w-7 h-7 ${info.iconColor}`} />
                       </div>
                       <div className="flex-1">
                         <div className="text-sm text-muted-foreground mb-1">{info.label}</div>

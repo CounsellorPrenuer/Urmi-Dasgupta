@@ -224,8 +224,8 @@ export function Packages() {
                         <ul className="space-y-3">
                           {pkg.features.map((feature, featureIndex) => (
                             <li key={featureIndex} className="flex items-start gap-3">
-                              <div className="w-5 h-5 rounded-full bg-primary-purple/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <Check className="w-3 h-3 text-primary-purple" />
+                              <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <Check className="w-3 h-3 text-emerald-600" />
                               </div>
                               <span className="text-sm text-foreground">{feature}</span>
                             </li>

@@ -35,21 +35,25 @@ const pillars = [
     icon: Lightbulb,
     title: 'Science Meets Soul',
     description: 'Blend of modern psychology and ancient healing wisdom',
+    iconColor: 'text-accent-orange',
   },
   {
     icon: Users,
     title: 'Data-Driven Self-Awareness',
     description: 'Psychometric tools that map strengths, patterns, and blind spots',
+    iconColor: 'text-secondary-blue',
   },
   {
     icon: Sparkles,
     title: 'Energy Integration',
     description: 'Balancing mind, body & emotion for peak alignment',
+    iconColor: 'text-yellow-500',
   },
   {
     icon: Heart,
     title: 'Transformational Coaching',
     description: 'Career + Relationship + Emotional Healing = Wholeness',
+    iconColor: 'text-rose-500',
   },
 ];
 
@@ -82,7 +86,7 @@ export function Services() {
               transition={{ duration: 0.6, delay: index * 0.1 }}
               className="h-full"
             >
-              <Card className="h-full bg-gradient-to-br from-primary-purple/20 to-purple-700/20 border border-primary-purple/30 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:bg-emerald-50/30 rounded-2xl overflow-visible" data-testid={`card-service-${index}`}>
+              <Card className="h-full bg-gradient-to-br from-primary-purple/20 to-purple-700/20 border border-primary-purple/30 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 rounded-2xl overflow-visible" data-testid={`card-service-${index}`}>
                 <CardHeader className="space-y-0 pb-4">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center mb-4">
                     <service.icon className={`w-7 h-7 ${service.color}`} />
@@ -119,7 +123,7 @@ export function Services() {
               data-testid={`pillar-${index}`}
             >
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center mx-auto mb-4 animate-float">
-                <pillar.icon className="w-8 h-8 text-emerald-600" />
+                <pillar.icon className={`w-8 h-8 ${pillar.iconColor}`} />
               </div>
               <h4 className="font-serif text-lg font-semibold mb-2">{pillar.title}</h4>
               <p className="text-sm text-muted-foreground">{pillar.description}</p>

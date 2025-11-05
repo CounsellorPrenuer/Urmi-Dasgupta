@@ -100,7 +100,7 @@ export function Hero() {
             }}
             className="flex justify-center relative group"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/0 via-emerald-500/0 to-emerald-600/0 group-hover:from-emerald-400/30 group-hover:via-emerald-500/40 group-hover:to-emerald-600/30 rounded-full blur-3xl transition-all duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/0 via-emerald-500/0 to-emerald-600/0 group-hover:from-emerald-400/30 group-hover:via-emerald-500/40 group-hover:to-emerald-600/30 rounded-full blur-3xl transition-all duration-1500 ease-in-out" />
             <img 
               src={logoImg} 
               alt="Claryntia Logo" 
