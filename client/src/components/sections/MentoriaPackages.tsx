@@ -97,7 +97,11 @@ export function MentoriaPackages() {
               className="w-full md:max-w-[calc(50%_-_0.75rem)] lg:max-w-[calc(33.333%_-_1rem)]"
             >
               <Card 
-                className="h-full glass-effect shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:bg-emerald-500/10 rounded-2xl flex flex-col border border-card-border"
+                className={`h-full glass-effect shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:bg-emerald-500/10 rounded-2xl flex flex-col ${
+                  pkg.name.toLowerCase().includes('plus') 
+                    ? 'border-2 border-primary-purple/50 shadow-[0_0_30px_rgba(106,27,154,0.3)]' 
+                    : 'border border-card-border'
+                }`}
                 data-testid={`card-mentoria-package-${pkg.id}`}
               >
                 
