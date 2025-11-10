@@ -248,7 +248,7 @@ export function FreeDiscoveryCallModal({ open, onOpenChange }: FreeDiscoveryCall
                 name="background"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Are you a:*</FormLabel>
+                    <FormLabel>Are you a: *</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-discovery-background">
