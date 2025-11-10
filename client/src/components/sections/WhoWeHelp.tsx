@@ -22,7 +22,7 @@ const audiences = [
     icon: Building2,
     title: 'Corporates & Institutions',
     description: 'Workshops on mental resilience, leadership growth & wellbeing.',
-    color: 'text-primary-purple',
+    color: 'text-green-600',
     bgGradient: 'from-emerald-50 to-emerald-100',
   },
   {
