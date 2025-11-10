@@ -86,19 +86,15 @@ export function Services() {
               transition={{ duration: 0.6, delay: index * 0.1 }}
               className="h-full"
             >
-              <Card className={`h-full ${
-                index % 2 === 0 
-                  ? 'bg-gradient-to-br from-primary-purple/20 to-purple-700/20' 
-                  : 'bg-gradient-to-br from-primary-purple/80 to-purple-700/80'
-              } border border-primary-purple/30 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 rounded-2xl overflow-visible`} data-testid={`card-service-${index}`}>
+              <Card className="h-full bg-gradient-to-br from-primary-purple/80 to-purple-700/80 border border-primary-purple/30 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 rounded-2xl overflow-visible" data-testid={`card-service-${index}`}>
                 <CardHeader className="space-y-0 pb-4">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center mb-4">
                     <service.icon className={`w-7 h-7 ${service.color}`} />
                   </div>
-                  <CardTitle className={`font-serif text-xl ${index % 2 === 0 ? 'text-accent-orange' : 'text-white'}`}>{service.title}</CardTitle>
+                  <CardTitle className="font-serif text-xl text-white">{service.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className={`text-sm leading-relaxed ${index % 2 === 0 ? 'text-foreground' : 'text-white/90'}`}>{service.description}</p>
+                  <p className="text-sm leading-relaxed text-white/90">{service.description}</p>
                 </CardContent>
               </Card>
             </motion.div>
