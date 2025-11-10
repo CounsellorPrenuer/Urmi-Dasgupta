@@ -56,15 +56,19 @@ export function Footer() {
             <ul className="space-y-4 text-sm text-white/90">
               <li className="flex items-start gap-3 group">
                 <Mail className="w-5 h-5 flex-shrink-0 mt-0.5 text-emerald-400 group-hover:text-emerald-300 transition-colors" />
-                <span>contact@claryntia.com</span>
+                <a href="mailto:claryntia@gmail.com" className="hover:text-emerald-300 transition-colors">
+                  claryntia@gmail.com
+                </a>
               </li>
               <li className="flex items-start gap-3 group">
                 <Phone className="w-5 h-5 flex-shrink-0 mt-0.5 text-emerald-400 group-hover:text-emerald-300 transition-colors" />
-                <span>+91 XXXXX XXXXX</span>
+                <a href="tel:+919886635186" className="hover:text-emerald-300 transition-colors">
+                  +91 9886635186
+                </a>
               </li>
               <li className="flex items-start gap-3 group">
                 <MapPin className="w-5 h-5 flex-shrink-0 mt-0.5 text-emerald-400 group-hover:text-emerald-300 transition-colors" />
-                <span>Kolkata, India</span>
+                <span>Bangalore, India</span>
               </li>
             </ul>
           </div>
