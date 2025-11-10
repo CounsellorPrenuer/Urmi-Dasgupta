@@ -275,7 +275,7 @@ export function FreeDiscoveryCallModal({ open, onOpenChange }: FreeDiscoveryCall
                   const wordCount = field.value ? field.value.trim().split(/\s+/).filter(word => word.length > 0).length : 0;
                   return (
                     <FormItem>
-                      <FormLabel>Brief Message * (Max 500 words)</FormLabel>
+                      <FormLabel>Tell me why you would like to connect* (Max 500 words)</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Share a brief summary of your situation..."
