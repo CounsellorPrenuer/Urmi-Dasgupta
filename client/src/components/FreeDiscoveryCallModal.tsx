@@ -120,7 +120,7 @@ export function FreeDiscoveryCallModal({ open, onOpenChange }: FreeDiscoveryCall
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto" data-testid="modal-free-discovery-call">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-purple to-secondary-blue flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-primary-purple flex items-center justify-center">
               <img src={logoImg} alt="Claryntia" className="w-8 h-8" />
             </div>
             <div>
@@ -170,7 +170,7 @@ export function FreeDiscoveryCallModal({ open, onOpenChange }: FreeDiscoveryCall
             </div>
 
             {/* Quick & Valuable Banner */}
-            <div className="bg-gradient-to-r from-primary-purple to-secondary-blue rounded-xl p-4">
+            <div className="bg-primary-purple rounded-xl p-4">
               <div className="flex items-center gap-3 text-white">
                 <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
                   <Phone className="w-5 h-5" />
@@ -296,7 +296,7 @@ export function FreeDiscoveryCallModal({ open, onOpenChange }: FreeDiscoveryCall
               <Button
                 type="submit"
                 size="lg"
-                className="w-full bg-gradient-to-r from-primary-purple to-secondary-blue text-white rounded-full"
+                className="w-full bg-primary-purple text-white rounded-full"
                 disabled={isSubmitting}
                 data-testid="button-submit-discovery-call"
               >
