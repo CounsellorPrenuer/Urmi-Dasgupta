@@ -25,7 +25,7 @@ const steps = [
     number: '03',
     title: 'Build emotional and professional harmony',
     description: 'Align goals, relationships, and energy fields',
-    iconColor: 'text-primary-purple',
+    iconColor: 'text-green-600',
     numberGradient: 'from-accent-orange to-primary-purple',
   },
   {
