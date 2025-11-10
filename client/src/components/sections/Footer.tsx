@@ -40,13 +40,13 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-serif text-lg font-semibold mb-6 text-accent-orange/90">Our Services</h4>
+            <h4 className="font-serif text-lg font-semibold mb-6 text-emerald-100">Our Services</h4>
             <ul className="space-y-3 text-sm text-white/90">
-              <li className="hover:text-accent-orange transition-colors cursor-default">Career Clarity & Guidance</li>
-              <li className="hover:text-accent-orange transition-colors cursor-default">Relationship Healing</li>
-              <li className="hover:text-accent-orange transition-colors cursor-default">Energy Reading</li>
-              <li className="hover:text-accent-orange transition-colors cursor-default">Workshops & Seminars</li>
-              <li className="hover:text-accent-orange transition-colors cursor-default">Mentoria Packages</li>
+              <li className="hover:text-emerald-300 transition-colors cursor-default">Career Clarity & Guidance</li>
+              <li className="hover:text-emerald-300 transition-colors cursor-default">Relationship Healing</li>
+              <li className="hover:text-emerald-300 transition-colors cursor-default">Energy Reading</li>
+              <li className="hover:text-emerald-300 transition-colors cursor-default">Workshops & Seminars</li>
+              <li className="hover:text-emerald-300 transition-colors cursor-default">Mentoria Packages</li>
             </ul>
           </div>
 
@@ -58,7 +58,7 @@ export function Footer() {
                 <span>contact@claryntia.com</span>
               </li>
               <li className="flex items-start gap-3 group">
-                <Phone className="w-5 h-5 flex-shrink-0 mt-0.5 text-accent-orange group-hover:text-accent-orange/80 transition-colors" />
+                <Phone className="w-5 h-5 flex-shrink-0 mt-0.5 text-emerald-400 group-hover:text-emerald-300 transition-colors" />
                 <span>+91 XXXXX XXXXX</span>
               </li>
               <li className="flex items-start gap-3 group">
