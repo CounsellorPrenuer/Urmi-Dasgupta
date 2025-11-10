@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Users, Building2, GraduationCap, Video, ExternalLink } from 'lucide-react';
 
 const stats = [
-  { icon: Users, value: '3,50,000+', label: 'Students and Professionals Mentored' },
-  { icon: Building2, value: '240+', label: 'Corporate Partners' },
-  { icon: GraduationCap, value: '350+', label: 'Schools and College Partners' },
-  { icon: Video, value: '1000+', label: 'Hours of Career Webinars' },
+  { icon: Users, value: '3,50,000+', label: 'Students and Professionals Mentored', iconColor: 'text-secondary-blue' },
+  { icon: Building2, value: '240+', label: 'Corporate Partners', iconColor: 'text-accent-orange' },
+  { icon: GraduationCap, value: '350+', label: 'Schools and College Partners', iconColor: 'text-green-600' },
+  { icon: Video, value: '1000+', label: 'Hours of Career Webinars', iconColor: 'text-rose-500' },
 ];
 
 export function Mentoria() {
@@ -42,7 +42,7 @@ export function Mentoria() {
             >
               <Card className="glass-effect border border-card-border shadow-lg p-6 text-center rounded-2xl hover:shadow-xl hover:bg-emerald-50/30 transition-all" data-testid={`stat-mentoria-${index}`}>
                 <div className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center mx-auto mb-4">
-                  <stat.icon className="w-7 h-7 text-emerald-600" />
+                  <stat.icon className={`w-7 h-7 ${stat.iconColor}`} />
                 </div>
                 <div className="font-serif text-3xl font-bold text-primary-purple mb-2">{stat.value}</div>
                 <div className="text-sm text-muted-foreground">{stat.label}</div>
