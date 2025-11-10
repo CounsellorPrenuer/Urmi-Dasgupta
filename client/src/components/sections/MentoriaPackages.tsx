@@ -4,7 +4,7 @@ import { useInView } from 'react-intersection-observer';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Check } from 'lucide-react';
+import { Check, Sparkles } from 'lucide-react';
 import type { MentoriaPackage } from '@shared/schema';
 import { MentoriaPaymentModal } from '@/components/MentoriaPaymentModal';
 
@@ -88,8 +88,9 @@ export function MentoriaPackages() {
         </motion.div>
 
         <div className="flex flex-wrap justify-center gap-6">
-          {filteredPackages.map((pkg, index) => (
-            <motion.div
+          {filteredPackages.map((pkg, index) => {
+            const isPlus = pkg.name.toLowerCase().includes('plus');
+            return (<motion.div
               key={pkg.id}
               initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -97,12 +98,31 @@ export function MentoriaPackages() {
               className="w-full md:max-w-[calc(50%_-_0.75rem)] lg:max-w-[calc(33.333%_-_1rem)]"
             >
               <Card 
-                className="h-full glass-effect shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:bg-emerald-500/10 rounded-2xl flex flex-col border border-card-border"
+                className={`h-full glass-effect shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 rounded-2xl flex flex-col relative ${
+                  isPlus 
+                    ? 'border-2 border-transparent bg-gradient-to-br from-primary-purple/10 via-accent-orange/5 to-secondary-blue/10 hover:bg-gradient-to-br hover:from-primary-purple/15 hover:via-accent-orange/10 hover:to-secondary-blue/15' 
+                    : 'border border-card-border hover:bg-emerald-500/10'
+                }`}
+                style={isPlus ? {
+                  backgroundImage: 'linear-gradient(white, white), linear-gradient(135deg, hsl(270, 73%, 35%), hsl(32, 100%, 50%))',
+                  backgroundOrigin: 'border-box',
+                  backgroundClip: 'padding-box, border-box',
+                } : undefined}
                 data-testid={`card-mentoria-package-${pkg.id}`}
               >
+                {isPlus && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                    <div className="bg-gradient-to-r from-primary-purple to-accent-orange text-white px-4 py-1 rounded-full text-sm font-semibold flex items-center gap-1 shadow-lg">
+                      <Sparkles className="w-4 h-4" />
+                      Premium Plus
+                    </div>
+                  </div>
+                )}
                 
                 <CardHeader className="space-y-2">
-                  <CardTitle className="font-serif text-2xl">{pkg.name}</CardTitle>
+                  <CardTitle className={`font-serif text-2xl ${isPlus ? 'bg-gradient-to-r from-primary-purple to-accent-orange bg-clip-text text-transparent' : ''}`}>
+                    {pkg.name}
+                  </CardTitle>
                   <div className="text-sm text-muted-foreground">{pkg.category}</div>
                   <div className="pt-2">
                     <div className="text-3xl font-bold text-primary-purple">
@@ -131,7 +151,11 @@ export function MentoriaPackages() {
                 <CardFooter>
                   <Button
                     size="lg"
-                    className="w-full bg-primary-purple text-white rounded-full"
+                    className={`w-full rounded-full ${
+                      isPlus 
+                        ? 'bg-gradient-to-r from-primary-purple to-accent-orange text-white hover:opacity-90' 
+                        : 'bg-primary-purple text-white'
+                    }`}
                     onClick={() => handleBookNow(pkg)}
                     data-testid={`button-book-${pkg.id}`}
                   >
@@ -140,7 +164,8 @@ export function MentoriaPackages() {
                 </CardFooter>
               </Card>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
