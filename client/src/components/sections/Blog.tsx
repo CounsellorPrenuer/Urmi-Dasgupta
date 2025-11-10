@@ -105,7 +105,7 @@ export function Blog() {
                     className="flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-12px)] lg:flex-[0_0_calc(33.333%-16px)]"
                   >
                     <Card 
-                      className="h-full flex flex-col glass-effect border border-card-border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:bg-orange-50/70 rounded-2xl overflow-hidden group cursor-pointer"
+                      className="h-full flex flex-col glass-effect border border-card-border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:bg-accent-orange/20 rounded-2xl overflow-hidden group cursor-pointer"
                       data-testid={`card-blog-${index}`}
                       onClick={() => handleReadMore(post)}
                     >
