@@ -141,7 +141,7 @@ export function FreeDiscoveryCallModal({ open, onOpenChange }: FreeDiscoveryCall
             <div>
               <h3 className="font-serif text-lg font-semibold mb-3 text-foreground flex items-center gap-2">
                 <Check className="w-5 h-5 text-green-600" />
-                What You'll Get (Free)
+                What You'll Receive
               </h3>
               <ul className="space-y-2">
                 {whatYouGet.map((item, index) => (
