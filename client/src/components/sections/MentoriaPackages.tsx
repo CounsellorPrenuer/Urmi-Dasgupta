@@ -4,7 +4,7 @@ import { useInView } from 'react-intersection-observer';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Check, Star } from 'lucide-react';
+import { Check } from 'lucide-react';
 import type { MentoriaPackage } from '@shared/schema';
 import { MentoriaPaymentModal } from '@/components/MentoriaPaymentModal';
 
@@ -38,7 +38,15 @@ export function MentoriaPackages() {
     return null;
   }
 
-  const filteredPackages = packages.filter(pkg => pkg.category === selectedCategory);
+  const filteredPackages = packages
+    .filter(pkg => pkg.category === selectedCategory)
+    .sort((a, b) => {
+      const aIsPlus = a.name.toLowerCase().includes('plus');
+      const bIsPlus = b.name.toLowerCase().includes('plus');
+      if (aIsPlus && !bIsPlus) return 1;
+      if (!aIsPlus && bIsPlus) return -1;
+      return 0;
+    });
 
   return (
     <section id="mentoria-packages" className="py-24 md:py-32 bg-gradient-to-br from-primary-purple/5 via-background to-secondary-blue/5" ref={ref}>
@@ -89,19 +97,9 @@ export function MentoriaPackages() {
               className="w-full md:max-w-[calc(50%_-_0.75rem)] lg:max-w-[calc(33.333%_-_1rem)]"
             >
               <Card 
-                className={`h-full glass-effect shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:bg-emerald-500/10 rounded-2xl flex flex-col ${
-                  pkg.isPopular ? 'border-2 border-primary-purple' : 'border border-card-border'
-                }`}
+                className="h-full glass-effect shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:bg-emerald-500/10 rounded-2xl flex flex-col border border-card-border"
                 data-testid={`card-mentoria-package-${pkg.id}`}
               >
-                {pkg.isPopular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-gradient-to-r from-primary-purple to-accent-orange text-white px-4 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
-                      <Star className="w-4 h-4 fill-white" />
-                      Popular
-                    </div>
-                  </div>
-                )}
                 
                 <CardHeader className="space-y-2">
                   <CardTitle className="font-serif text-2xl">{pkg.name}</CardTitle>
