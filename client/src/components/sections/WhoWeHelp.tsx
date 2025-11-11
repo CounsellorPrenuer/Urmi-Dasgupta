@@ -85,7 +85,7 @@ export function WhoWeHelp() {
           className="mt-16 text-center"
         >
           <div className="glass-effect border border-card-border rounded-3xl p-12 max-w-4xl mx-auto shadow-xl">
-            <h3 className="font-serif text-3xl font-bold mb-4">
+            <h3 className="font-serif text-3xl font-bold mb-4 text-emerald-600">
               The Transformation Starts Within
             </h3>
             <p className="text-xl text-accent-orange italic mb-6">
