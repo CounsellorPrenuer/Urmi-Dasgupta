@@ -79,6 +79,7 @@ Each section uses intersection observers to trigger animations when scrolling in
   - `GET /api/testimonials/:id` - Get single testimonial
   - `PUT /api/testimonials/:id` - Update testimonial (requires admin authentication)
   - `DELETE /api/testimonials/:id` - Delete testimonial (requires admin authentication)
+  - `POST /api/admin/seed-testimonial-photos` - Backfill profile photos from stock images (requires admin authentication, idempotent)
 - Blogs:
   - `GET /api/blogs` - Get all blogs (public)
   - `POST /api/blogs` - Create blog (requires admin authentication)
@@ -132,6 +133,14 @@ Each section uses intersection observers to trigger animations when scrolling in
     - Testimonial profile pictures stored in object storage
     - Blog featured images with migration endpoint for production fixes
     - Automatic URL normalization to `/objects/` prefix
+  - Testimonial photo seeding feature:
+    - "Backfill Photos" button in Testimonials admin to assign stock profile photos
+    - Uses deterministic naming: `testimonial-{id}.jpg` in public bucket
+    - Fully idempotent: checks existing URLs and object storage before uploading
+    - Repairs broken references by re-uploading if object was deleted
+    - Maps specific stock images to testimonial names from attached assets
+    - Comprehensive error tracking with detailed feedback to admin
+    - Updates only imageUrl field to prevent data corruption
 
 ### Data Storage
 
