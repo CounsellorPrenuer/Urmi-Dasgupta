@@ -708,6 +708,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Migration endpoint to add profile photos to existing testimonials
   app.post("/api/admin/seed-testimonial-photos", isAuthenticated, async (req, res) => {
     try {
+      console.log("[SEED] Starting testimonial photo seeding...");
       const fs = await import('fs/promises');
       const path = await import('path');
       
@@ -715,26 +716,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const imageAssignments = {
         'Anshu Aggarwal': 'professional_woman_h_30c2f2ce.jpg',
         'Barinder Bedi': 'professional_man_hea_984d4343.jpg',
+        'Suneeta Sodhi': 'professional_woman_h_53c5cc03.jpg',
         'Kavya Shaji': 'professional_woman_h_5d9e4850.jpg',
         'Amit': 'professional_man_hea_ef85437d.jpg',
-        'Prajakta Keni': 'professional_woman_h_53c5cc03.jpg',
+        'Saurabh Chandel': 'professional_man_hea_3364bfac.jpg',
+        'Prajakta Keni': 'professional_woman_h_30c2f2ce.jpg',
+        'Thakur Singh': 'professional_man_hea_984d4343.jpg',
         'Divya K': 'professional_diverse_96d9bf99.jpg',
         'Neha Mehta': 'professional_diverse_7512fa13.jpg',
-        'Vijay Kumar': 'professional_man_hea_3364bfac.jpg',
+        'Vijay Kumar': 'professional_man_hea_ef85437d.jpg',
         'Avichal': 'professional_diverse_ca85497e.jpg',
-        'Mithra Suresh': 'professional_diverse_4c963be5.jpg'
+        'Mithra Suresh': 'professional_diverse_4c963be5.jpg',
+        'Suzanne': 'professional_woman_h_5d9e4850.jpg',
+        'Rina Jani': 'professional_diverse_7512fa13.jpg',
+        'Archana Khosa': 'professional_woman_h_53c5cc03.jpg',
+        'Sarah Johnson': 'professional_diverse_96d9bf99.jpg'
       };
 
       const testimonials = await storage.getTestimonials();
+      console.log(`[SEED] Found ${testimonials.length} testimonials to process`);
+      
       const objectService = new ObjectStorageService();
-      const publicSearchPaths = objectService.getPublicObjectSearchPaths();
-      const publicPath = publicSearchPaths[0]; // Use first public path
+      const privateDir = objectService.getPrivateObjectDir();
+      console.log(`[SEED] Using private dir: ${privateDir}`);
+      
+      // Parse the private directory to get bucket name
+      const { bucketName } = parseObjectPath(privateDir);
+      console.log(`[SEED] Bucket name: ${bucketName}`);
       
       let updatedCount = 0;
       const errors: string[] = [];
 
-      // Parse the public path to get bucket name
-      const { bucketName } = parseObjectPath(publicPath);
       const bucket = objectStorageClient.bucket(bucketName);
 
       for (const testimonial of testimonials) {
@@ -747,9 +759,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Determine the deterministic object path for this testimonial
         const deterministicFileName = `testimonial-${testimonial.id}.jpg`;
-        const objectName = `public/${deterministicFileName}`;
-        const expectedImageUrl = `/objects/${bucketName}/${objectName}`;
+        // Store in private dir - the download handler will resolve the full path
+        const objectPath = `${privateDir}/${deterministicFileName}`;
+        const { objectName } = parseObjectPath(objectPath);
+        // URL format: /objects/entityId (download handler adds private dir automatically)
+        const expectedImageUrl = `/objects/${deterministicFileName}`;
         const file = bucket.file(objectName);
+        console.log(`[SEED] Processing ${trimmedName}: object=${objectName}, url=${expectedImageUrl}`);
 
         // Check if testimonial already has the correct URL and the object exists
         if (testimonial.imageUrl === expectedImageUrl) {
@@ -781,32 +797,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
             continue;
           }
 
-          // Read the image file
+            // Read the image file
           const imageBuffer = await fs.readFile(stockImagePath);
+          console.log(`[SEED] Read ${imageBuffer.length} bytes for ${trimmedName}`);
           
           // Check if file already exists in object storage
-          const [exists] = await file.exists();
+          let [exists] = await file.exists();
+          console.log(`[SEED] Object exists for ${trimmedName}: ${exists}`);
+          
           if (!exists) {
             // Upload the image
+            console.log(`[SEED] Uploading image for ${trimmedName} to ${objectName}...`);
             await file.save(imageBuffer, {
               metadata: {
                 contentType: 'image/jpeg',
               },
             });
+            console.log(`[SEED] Upload complete for ${trimmedName}`);
             
             // Set ACL to public
+            console.log(`[SEED] Setting ACL to public for ${trimmedName}...`);
             await setObjectAclPolicy(file, {
               visibility: 'public',
               owner: 'system',
             });
+            console.log(`[SEED] ACL set for ${trimmedName}`);
+            
+            // Verify upload succeeded
+            [exists] = await file.exists();
+            if (!exists) {
+              throw new Error('Upload verification failed - object does not exist after save');
+            }
           }
           
-          // Update testimonial with only the imageUrl field
+          // Only update database if upload succeeded
+          console.log(`[SEED] Updating testimonial ${trimmedName} with URL: ${expectedImageUrl}`);
           await storage.updateTestimonial(testimonial.id, {
             imageUrl: expectedImageUrl,
           });
           
           updatedCount++;
+          console.log(`[SEED] Successfully processed ${trimmedName} (${updatedCount} total)`);
         } catch (error) {
           const errorMsg = `Error processing image for ${trimmedName}: ${error instanceof Error ? error.message : String(error)}`;
           console.error(errorMsg);
@@ -814,6 +845,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      console.log(`[SEED] Completed! Updated ${updatedCount} testimonials with ${errors.length} errors`);
       res.json({ 
         success: errors.length === 0, 
         message: errors.length === 0 

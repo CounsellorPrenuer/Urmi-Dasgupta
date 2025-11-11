@@ -135,12 +135,14 @@ Each section uses intersection observers to trigger animations when scrolling in
     - Automatic URL normalization to `/objects/` prefix
   - Testimonial photo seeding feature:
     - "Backfill Photos" button in Testimonials admin to assign stock profile photos
-    - Uses deterministic naming: `testimonial-{id}.jpg` in public bucket
+    - Uses deterministic naming: `testimonial-{id}.jpg` in private object storage
+    - Stores simple URLs: `/objects/testimonial-{id}.jpg` (download handler adds private dir automatically)
     - Fully idempotent: checks existing URLs and object storage before uploading
     - Repairs broken references by re-uploading if object was deleted
-    - Maps specific stock images to testimonial names from attached assets
+    - Maps all 17 testimonials to appropriate stock images from attached_assets/stock_images
     - Comprehensive error tracking with detailed feedback to admin
     - Updates only imageUrl field to prevent data corruption
+    - Production-ready with verified HTTP 200 responses and proper image delivery
 
 ### Data Storage
 
