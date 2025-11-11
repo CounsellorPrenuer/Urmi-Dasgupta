@@ -57,7 +57,7 @@ export function ChangingLandscape() {
               transition={{ duration: 0.6, delay: index * 0.15 }}
             >
               <Card className="glass-effect border border-card-border shadow-xl hover:shadow-2xl transition-all duration-300 hover:bg-emerald-500/10 rounded-2xl p-8 text-center cursor-default" data-testid={`card-insight-${index}`}>
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-50 to-purple-100 flex items-center justify-center mx-auto mb-6">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center mx-auto mb-6">
                   <insight.icon className={`w-8 h-8 ${insight.iconColor}`} />
                 </div>
                 <div className="font-serif text-5xl font-bold text-accent-orange mb-4">{insight.stat}</div>
@@ -73,7 +73,7 @@ export function ChangingLandscape() {
           transition={{ duration: 0.6, delay: 0.5 }}
           className="text-center"
         >
-          <p className="text-xl text-emerald-600 font-semibold max-w-4xl mx-auto">
+          <p className="text-xl text-primary-purple font-semibold max-w-4xl mx-auto">
             At Claryntia, we help you rise above these patterns to design a fulfilled, future-ready life.
           </p>
         </motion.div>
