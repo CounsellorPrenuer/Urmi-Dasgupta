@@ -33,7 +33,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Pencil, Trash2, Upload } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, RefreshCw } from "lucide-react";
 import type { Blog } from "@shared/schema";
 import { ObjectUploader } from "@/components/ObjectUploader";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -92,6 +92,27 @@ export default function BlogsAdmin() {
       setIsDialogOpen(false);
       setEditingBlog(null);
       form.reset();
+    },
+  });
+
+  const migrateMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/admin/migrate-blog-images", {});
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/blogs"] });
+      toast({ 
+        title: "Migration Complete", 
+        description: `Updated ${data.updatedCount} blog image URLs` 
+      });
+    },
+    onError: () => {
+      toast({ 
+        title: "Migration Failed", 
+        description: "Unable to migrate blog images",
+        variant: "destructive" 
+      });
     },
   });
 
@@ -179,145 +200,156 @@ export default function BlogsAdmin() {
             <p className="text-sm md:text-base text-muted-foreground">Manage blog posts</p>
           </div>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
-          <DialogTrigger asChild>
-            <Button data-testid="button-add-blog">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Blog
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>
-                {editingBlog ? "Edit Blog" : "Add Blog"}
-              </DialogTitle>
-              <DialogDescription>
-                {editingBlog ? "Update the blog post" : "Create a new blog post"}
-              </DialogDescription>
-            </DialogHeader>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Blog title" data-testid="input-title" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="author"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Author</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Author name" data-testid="input-author" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="excerpt"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Excerpt</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Brief summary" data-testid="input-excerpt" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="content"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Content</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Full blog content" rows={10} data-testid="input-content" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="space-y-4 p-4 border border-border rounded-lg bg-muted/30">
-                  <div className="flex items-center justify-between">
-                    <FormLabel className="text-base font-semibold">Blog Image (Optional)</FormLabel>
-                    {form.watch("imageUrl") && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => form.setValue("imageUrl", "")}
-                        data-testid="button-clear-image"
-                      >
-                        Clear Image
-                      </Button>
-                    )}
-                  </div>
-                  
-                  {form.watch("imageUrl") && (
-                    <div className="relative w-full h-48 rounded-lg overflow-hidden border border-border">
-                      <img 
-                        src={form.watch("imageUrl")} 
-                        alt="Blog preview" 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-
+        <div className="flex gap-2">
+          <Button 
+            variant="outline"
+            onClick={() => migrateMutation.mutate()}
+            disabled={migrateMutation.isPending}
+            data-testid="button-migrate-images"
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${migrateMutation.isPending ? 'animate-spin' : ''}`} />
+            Fix Images
+          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
+            <DialogTrigger asChild>
+              <Button data-testid="button-add-blog">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Blog
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingBlog ? "Edit Blog" : "Add Blog"}
+                </DialogTitle>
+                <DialogDescription>
+                  {editingBlog ? "Update the blog post" : "Create a new blog post"}
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   <FormField
                     control={form.control}
-                    name="imageUrl"
+                    name="title"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-normal">Enter Image URL</FormLabel>
+                        <FormLabel>Title</FormLabel>
                         <FormControl>
-                          <Input placeholder="https://example.com/image.jpg" data-testid="input-imageurl" {...field} />
+                          <Input placeholder="Blog title" data-testid="input-title" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  
-                  <div className="flex items-center gap-3">
-                    <div className="h-px bg-border flex-1"></div>
-                    <span className="text-sm font-medium text-muted-foreground">OR</span>
-                    <div className="h-px bg-border flex-1"></div>
+                  <FormField
+                    control={form.control}
+                    name="author"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Author</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Author name" data-testid="input-author" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="excerpt"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Excerpt</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder="Brief summary" data-testid="input-excerpt" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="content"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Content</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder="Full blog content" rows={10} data-testid="input-content" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="space-y-4 p-4 border border-border rounded-lg bg-muted/30">
+                    <div className="flex items-center justify-between">
+                      <FormLabel className="text-base font-semibold">Blog Image (Optional)</FormLabel>
+                      {form.watch("imageUrl") && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => form.setValue("imageUrl", "")}
+                          data-testid="button-clear-image"
+                        >
+                          Clear Image
+                        </Button>
+                      )}
+                    </div>
+                    
+                    {form.watch("imageUrl") && (
+                      <div className="relative w-full h-48 rounded-lg overflow-hidden border border-border">
+                        <img 
+                          src={form.watch("imageUrl")} 
+                          alt="Blog preview" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+
+                    <FormField
+                      control={form.control}
+                      name="imageUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-normal">Enter Image URL</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://example.com/image.jpg" data-testid="input-imageurl" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <div className="flex items-center gap-3">
+                      <div className="h-px bg-border flex-1"></div>
+                      <span className="text-sm font-medium text-muted-foreground">OR</span>
+                      <div className="h-px bg-border flex-1"></div>
+                    </div>
+                    
+                    <div className="flex flex-col gap-2">
+                      <ObjectUploader
+                        maxNumberOfFiles={1}
+                        maxFileSize={10485760}
+                        onGetUploadParameters={handleGetUploadParameters}
+                        onComplete={handleUploadComplete}
+                        buttonVariant="secondary"
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload Image from Your Device
+                      </ObjectUploader>
+                      <p className="text-xs text-muted-foreground text-center">
+                        Max file size: 10 MB. Supported formats: JPG, PNG, GIF
+                      </p>
+                    </div>
                   </div>
-                  
-                  <div className="flex flex-col gap-2">
-                    <ObjectUploader
-                      maxNumberOfFiles={1}
-                      maxFileSize={10485760}
-                      onGetUploadParameters={handleGetUploadParameters}
-                      onComplete={handleUploadComplete}
-                      buttonVariant="secondary"
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload Image from Your Device
-                    </ObjectUploader>
-                    <p className="text-xs text-muted-foreground text-center">
-                      Max file size: 10 MB. Supported formats: JPG, PNG, GIF
-                    </p>
-                  </div>
-                </div>
-                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending} data-testid="button-submit-blog">
-                  {editingBlog ? "Update" : "Create"}
-                </Button>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
+                  <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending} data-testid="button-submit-blog">
+                    {editingBlog ? "Update" : "Create"}
+                  </Button>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <Card>
