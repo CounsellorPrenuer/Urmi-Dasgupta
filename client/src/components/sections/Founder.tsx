@@ -28,7 +28,7 @@ export function Founder() {
             Meet the Founder
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Urmi Dasgupta — Blending executive wisdom with intuitive healing
+            <span className="text-2xl font-bold text-foreground">Urmi Dasgupta</span> — Blending executive wisdom with intuitive healing
           </p>
         </motion.div>
 
