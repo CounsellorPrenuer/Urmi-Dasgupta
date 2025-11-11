@@ -140,8 +140,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
       );
 
+      // Ensure the objectPath is normalized with /objects/ prefix
+      const normalizedPath = objectPath.startsWith('/objects/') 
+        ? objectPath 
+        : `/objects${objectPath.startsWith('/') ? '' : '/'}${objectPath}`;
+
       res.status(200).json({
-        objectPath: objectPath,
+        objectPath: normalizedPath,
       });
     } catch (error) {
       console.error("Error setting blog image:", error);
@@ -263,10 +268,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Helper function to normalize blog image URLs
+  function normalizeBlogImageUrl(imageUrl: string | null): string | null {
+    if (!imageUrl) return null;
+    
+    // If it already starts with /objects/, return as is
+    if (imageUrl.startsWith('/objects/')) {
+      return imageUrl;
+    }
+    
+    // If it's a raw bucket path (e.g., /repl-default-bucket-xxx/...)
+    // or any other format, prepend /objects/
+    if (imageUrl.startsWith('/')) {
+      return `/objects${imageUrl}`;
+    }
+    
+    // If it's already a full URL, return as is
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl;
+    }
+    
+    // Otherwise prepend /objects/
+    return `/objects/${imageUrl}`;
+  }
+
   app.get("/api/blogs", async (req, res) => {
     try {
       const blogs = await storage.getBlogs();
-      res.json(blogs);
+      // Normalize image URLs before returning
+      const normalizedBlogs = blogs.map(blog => ({
+        ...blog,
+        imageUrl: normalizeBlogImageUrl(blog.imageUrl)
+      }));
+      res.json(normalizedBlogs);
     } catch (error) {
       console.error("Error fetching blogs:", error);
       res.status(500).json({ success: false, message: "Error fetching blogs" });
@@ -279,7 +313,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!blog) {
         return res.status(404).json({ success: false, message: "Blog not found" });
       }
-      res.json(blog);
+      // Normalize image URL before returning
+      const normalizedBlog = {
+        ...blog,
+        imageUrl: normalizeBlogImageUrl(blog.imageUrl)
+      };
+      res.json(normalizedBlog);
     } catch (error) {
       console.error("Error fetching blog:", error);
       res.status(500).json({ success: false, message: "Error fetching blog" });
