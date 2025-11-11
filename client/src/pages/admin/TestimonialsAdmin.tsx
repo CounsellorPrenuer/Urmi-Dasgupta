@@ -33,7 +33,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Pencil, Trash2, Star, Upload } from "lucide-react";
+import { Plus, Pencil, Trash2, Star, Upload, RefreshCw } from "lucide-react";
 import type { Testimonial } from "@shared/schema";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ObjectUploader } from "@/components/ObjectUploader";
@@ -103,6 +103,43 @@ export default function TestimonialsAdmin() {
       toast({ title: "Testimonial deleted successfully" });
     },
   });
+
+  const seedPhotosMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/admin/seed-testimonial-photos", {});
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/testimonials"] });
+      
+      if (data.errors && data.errors.length > 0) {
+        toast({ 
+          title: "Partial success",
+          description: `Updated ${data.updatedCount} testimonials. ${data.errors.length} errors occurred.`,
+          variant: "destructive"
+        });
+        console.error("Seed errors:", data.errors);
+      } else {
+        toast({ 
+          title: "Profile photos backfilled successfully",
+          description: `Updated ${data.updatedCount} testimonials with profile photos`
+        });
+      }
+    },
+    onError: () => {
+      toast({ 
+        title: "Failed to backfill profile photos",
+        description: "Please try again",
+        variant: "destructive"
+      });
+    },
+  });
+
+  const handleSeedPhotos = () => {
+    if (confirm("This will add profile photos to testimonials that don't have images yet. Continue?")) {
+      seedPhotosMutation.mutate();
+    }
+  };
 
   const onSubmit = (data: TestimonialFormData) => {
     if (editingTestimonial) {
@@ -177,13 +214,23 @@ export default function TestimonialsAdmin() {
             <p className="text-sm md:text-base text-muted-foreground">Manage customer testimonials</p>
           </div>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
-          <DialogTrigger asChild>
-            <Button data-testid="button-add-testimonial">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Testimonial
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={handleSeedPhotos}
+            disabled={seedPhotosMutation.isPending}
+            data-testid="button-seed-photos"
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${seedPhotosMutation.isPending ? 'animate-spin' : ''}`} />
+            Backfill Photos
+          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
+            <DialogTrigger asChild>
+              <Button data-testid="button-add-testimonial">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Testimonial
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
@@ -302,7 +349,8 @@ export default function TestimonialsAdmin() {
               </form>
             </Form>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <Card>
