@@ -239,7 +239,7 @@ export function Packages() {
                           className="w-full rounded-full py-6 bg-primary-purple text-white"
                           data-testid={`button-get-started-${index}`}
                         >
-                          Get Started
+                          Book Now
                         </Button>
                       </CardFooter>
                     </Card>
