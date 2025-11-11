@@ -346,6 +346,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin endpoint to fix/migrate blog image URLs
+  app.post("/api/admin/migrate-blog-images", isAuthenticated, async (req, res) => {
+    try {
+      const blogs = await storage.getBlogs();
+      let updatedCount = 0;
+
+      for (const blog of blogs) {
+        if (blog.imageUrl) {
+          const normalizedUrl = normalizeBlogImageUrl(blog.imageUrl);
+          
+          // Only update if the URL needs normalization
+          if (normalizedUrl !== blog.imageUrl) {
+            await storage.updateBlog(blog.id, {
+              ...blog,
+              imageUrl: normalizedUrl
+            });
+            updatedCount++;
+          }
+        }
+      }
+
+      res.json({ 
+        success: true, 
+        message: `Migrated ${updatedCount} blog image URLs`,
+        updatedCount 
+      });
+    } catch (error) {
+      console.error("Error migrating blog images:", error);
+      res.status(500).json({ success: false, message: "Error migrating blog images" });
+    }
+  });
+
   app.post("/api/packages", isAuthenticated, async (req, res) => {
     try {
       const validatedData = insertPackageSchema.parse(req.body);
