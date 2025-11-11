@@ -33,14 +33,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Pencil, Trash2, Star } from "lucide-react";
+import { Plus, Pencil, Trash2, Star, Upload } from "lucide-react";
 import type { Testimonial } from "@shared/schema";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { ObjectUploader } from "@/components/ObjectUploader";
 
 const testimonialSchema = z.object({
   name: z.string().min(1, "Name is required"),
   content: z.string().min(1, "Content is required"),
   rating: z.coerce.number().min(1).max(5),
+  imageUrl: z.string().optional(),
 });
 
 type TestimonialFormData = z.infer<typeof testimonialSchema>;
@@ -60,6 +62,7 @@ export default function TestimonialsAdmin() {
       name: "",
       content: "",
       rating: 5,
+      imageUrl: "",
     },
   });
 
@@ -115,8 +118,31 @@ export default function TestimonialsAdmin() {
       name: testimonial.name,
       content: testimonial.content,
       rating: testimonial.rating,
+      imageUrl: testimonial.imageUrl || "",
     });
     setIsDialogOpen(true);
+  };
+
+  const handleGetUploadParameters = async () => {
+    const response = await apiRequest("GET", "/api/objects/upload");
+    const data = await response.json();
+    return {
+      uploadURL: data.uploadURL,
+      fields: {},
+    };
+  };
+
+  const handleUploadComplete = async (uploadResult: { signedURL: string }) => {
+    const response = await apiRequest("POST", "/api/objects/upload", {
+      imageURL: uploadResult.signedURL,
+    });
+
+    const data = await response.json();
+    form.setValue("imageUrl", data.objectPath);
+    toast({ 
+      title: "Image uploaded successfully",
+      description: "Profile picture has been set"
+    });
   };
 
   const handleDelete = (id: string) => {
@@ -204,6 +230,68 @@ export default function TestimonialsAdmin() {
                     </FormItem>
                   )}
                 />
+                <div className="space-y-4 p-4 border border-border rounded-lg bg-muted/30">
+                  <div className="flex items-center justify-between">
+                    <FormLabel className="text-base font-semibold">Profile Picture (Optional)</FormLabel>
+                    {form.watch("imageUrl") && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => form.setValue("imageUrl", "")}
+                        data-testid="button-clear-image"
+                      >
+                        Clear Image
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {form.watch("imageUrl") && (
+                    <div className="relative w-24 h-24 rounded-full overflow-hidden border border-border mx-auto">
+                      <img 
+                        src={form.watch("imageUrl")} 
+                        alt="Profile preview" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+
+                  <FormField
+                    control={form.control}
+                    name="imageUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-normal">Enter Image URL</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://example.com/image.jpg" data-testid="input-imageurl" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="h-px bg-border flex-1"></div>
+                    <span className="text-sm font-medium text-muted-foreground">OR</span>
+                    <div className="h-px bg-border flex-1"></div>
+                  </div>
+                  
+                  <div className="flex flex-col gap-2">
+                    <ObjectUploader
+                      maxNumberOfFiles={1}
+                      maxFileSize={10485760}
+                      onGetUploadParameters={handleGetUploadParameters}
+                      onComplete={handleUploadComplete}
+                      buttonVariant="secondary"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Upload Profile Picture
+                    </ObjectUploader>
+                    <p className="text-xs text-muted-foreground text-center">
+                      Max file size: 10 MB. Recommended: Square image for best results
+                    </p>
+                  </div>
+                </div>
                 <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending} data-testid="button-submit-testimonial">
                   {editingTestimonial ? "Update" : "Create"}
                 </Button>
