@@ -73,7 +73,7 @@ export function ChangingLandscape() {
           transition={{ duration: 0.6, delay: 0.5 }}
           className="text-center"
         >
-          <p className="text-xl text-primary-purple font-semibold max-w-4xl mx-auto">
+          <p className="text-xl text-emerald-600 font-semibold max-w-4xl mx-auto">
             At Claryntia, we help you rise above these patterns to design a fulfilled, future-ready life.
           </p>
         </motion.div>
