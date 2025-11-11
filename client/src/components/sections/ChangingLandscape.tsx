@@ -14,7 +14,7 @@ const insights = [
     icon: Sparkles,
     stat: '60%',
     description: 'of youth report confusion about purpose or direction',
-    iconColor: 'text-accent-orange',
+    iconColor: 'text-emerald-600',
   },
   {
     icon: Heart,
