@@ -41,7 +41,7 @@ export function Founder() {
           >
             <Card className="glass-effect border border-card-border shadow-2xl rounded-3xl p-8 md:p-12">
               <div className="mb-6">
-                <h3 className="font-serif text-3xl font-bold mb-4">Urmi Dasgupta</h3>
+                <h3 className="font-serif text-4xl md:text-5xl font-bold mb-4">Urmi Dasgupta</h3>
                 <p className="text-muted-foreground leading-relaxed mb-6">
                   With 20+ years of corporate experience in Customer Success, Talent Management, and Leadership Transformation, 
                   Urmi blends executive wisdom with intuitive healing.
