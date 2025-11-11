@@ -807,29 +807,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
           let [exists] = await file.exists();
           console.log(`[SEED] Object exists for ${trimmedName}: ${exists}`);
           
+          // Always re-upload to ensure fresh images with updated assignments
+          if (exists) {
+            console.log(`[SEED] Deleting existing object for ${trimmedName} to force fresh upload...`);
+            await file.delete();
+          }
+          
+          // Upload the image
+          console.log(`[SEED] Uploading image for ${trimmedName} to ${objectName}...`);
+          await file.save(imageBuffer, {
+            metadata: {
+              contentType: 'image/jpeg',
+            },
+          });
+          console.log(`[SEED] Upload complete for ${trimmedName}`);
+          
+          // Set ACL to public
+          console.log(`[SEED] Setting ACL to public for ${trimmedName}...`);
+          await setObjectAclPolicy(file, {
+            visibility: 'public',
+            owner: 'system',
+          });
+          console.log(`[SEED] ACL set for ${trimmedName}`);
+          
+          // Verify upload succeeded
+          [exists] = await file.exists();
           if (!exists) {
-            // Upload the image
-            console.log(`[SEED] Uploading image for ${trimmedName} to ${objectName}...`);
-            await file.save(imageBuffer, {
-              metadata: {
-                contentType: 'image/jpeg',
-              },
-            });
-            console.log(`[SEED] Upload complete for ${trimmedName}`);
-            
-            // Set ACL to public
-            console.log(`[SEED] Setting ACL to public for ${trimmedName}...`);
-            await setObjectAclPolicy(file, {
-              visibility: 'public',
-              owner: 'system',
-            });
-            console.log(`[SEED] ACL set for ${trimmedName}`);
-            
-            // Verify upload succeeded
-            [exists] = await file.exists();
-            if (!exists) {
-              throw new Error('Upload verification failed - object does not exist after save');
-            }
+            throw new Error('Upload verification failed - object does not exist after save');
           }
           
           // Only update database if upload succeeded
