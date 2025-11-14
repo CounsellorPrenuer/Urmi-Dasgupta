@@ -89,7 +89,7 @@ export function Services() {
               <Card className="h-full border border-primary-purple/30 group-hover:border-accent-orange/20 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 rounded-2xl overflow-hidden group relative" data-testid={`card-service-${index}`}>
                 <div className="absolute inset-0 bg-gradient-to-br from-primary-purple/80 to-purple-700/80 opacity-100 group-hover:opacity-0 transition-opacity duration-300 rounded-2xl pointer-events-none" />
                 <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl pointer-events-none" />
-                <div className="absolute inset-0 bg-accent-orange/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl pointer-events-none" />
+                <div className="absolute inset-0 bg-accent-orange/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl pointer-events-none" />
                 <CardHeader className="space-y-0 pb-4 relative z-10">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center mb-4">
                     <service.icon className={`w-7 h-7 ${service.color}`} />
