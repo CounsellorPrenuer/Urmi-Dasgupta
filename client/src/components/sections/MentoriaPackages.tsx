@@ -4,6 +4,7 @@ import { useInView } from 'react-intersection-observer';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Check } from 'lucide-react';
 import type { MentoriaPackage } from '@shared/schema';
 import { MentoriaPaymentModal } from '@/components/MentoriaPaymentModal';
@@ -106,7 +107,14 @@ export function MentoriaPackages() {
               >
                 
                 <CardHeader className="space-y-2">
-                  <CardTitle className="font-serif text-2xl text-accent-orange">{pkg.name}</CardTitle>
+                  <div className="flex items-start justify-between gap-2">
+                    <CardTitle className="font-serif text-2xl text-accent-orange flex-1">{pkg.name}</CardTitle>
+                    {pkg.name.toLowerCase().includes('plus') && (
+                      <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0 shadow-md" data-testid={`badge-popular-${pkg.id}`}>
+                        Popular
+                      </Badge>
+                    )}
+                  </div>
                   <div className="text-sm text-muted-foreground">{pkg.category}</div>
                   <div className="pt-2">
                     <div className="text-3xl font-bold text-primary-purple">
