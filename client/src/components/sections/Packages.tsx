@@ -8,7 +8,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Check, ChevronLeft, ChevronRight, Copy } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Copy, Star } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import useEmblaCarousel from 'embla-carousel-react';
 import { QRCodeSVG } from 'qrcode.react';
 import type { Package } from '@shared/schema';
@@ -206,9 +207,17 @@ export function Packages() {
                     className="flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-12px)] lg:flex-[0_0_calc(33.333%-16px)]"
                   >
                     <Card
-                      className="h-full flex flex-col glass-effect border border-card-border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:bg-emerald-500/10 rounded-3xl"
+                      className="h-full flex flex-col glass-effect border border-card-border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:bg-emerald-500/10 rounded-3xl relative"
                       data-testid={`card-package-${index}`}
                     >
+                      {pkg.isPopular && (
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                          <Badge className="bg-gradient-to-r from-accent-orange to-orange-600 text-white px-4 py-1 text-xs font-semibold shadow-lg" data-testid={`badge-popular-${index}`}>
+                            <Star className="w-3 h-3 mr-1 fill-current" />
+                            POPULAR
+                          </Badge>
+                        </div>
+                      )}
                       <CardHeader className="space-y-0 pb-6 pt-8">
                         <CardTitle className="font-serif text-2xl mb-2 bg-gradient-to-r from-accent-orange to-orange-600 bg-clip-text text-transparent font-bold">{pkg.name}</CardTitle>
                         <p className="text-sm text-muted-foreground mb-2">{pkg.description}</p>

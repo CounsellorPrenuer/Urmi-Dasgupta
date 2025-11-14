@@ -8,6 +8,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -33,7 +34,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Pencil, Trash2, Star } from "lucide-react";
 import type { Package } from "@shared/schema";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
@@ -43,6 +45,7 @@ const packageSchema = z.object({
   price: z.coerce.number().min(0, "Price must be positive"),
   duration: z.string().min(1, "Duration is required"),
   features: z.string().min(1, "Features are required"),
+  isPopular: z.boolean().default(false),
 });
 
 type PackageFormData = z.infer<typeof packageSchema>;
@@ -64,6 +67,7 @@ export default function PackagesAdmin() {
       price: 0,
       duration: "",
       features: "",
+      isPopular: false,
     },
   });
 
@@ -123,6 +127,7 @@ export default function PackagesAdmin() {
       price: pkg.price,
       duration: pkg.duration,
       features: pkg.features.join('\n'),
+      isPopular: pkg.isPopular || false,
     });
     setIsDialogOpen(true);
   };
@@ -238,6 +243,29 @@ export default function PackagesAdmin() {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="isPopular"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          data-testid="checkbox-is-popular"
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>
+                          Mark as Popular
+                        </FormLabel>
+                        <p className="text-sm text-muted-foreground">
+                          Show a "Popular" badge on this package
+                        </p>
+                      </div>
+                    </FormItem>
+                  )}
+                />
                 <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending} data-testid="button-submit-package">
                   {editingPackage ? "Update" : "Create"}
                 </Button>
@@ -259,6 +287,7 @@ export default function PackagesAdmin() {
                 <TableHead className="min-w-[150px]">Name</TableHead>
                 <TableHead className="min-w-[100px]">Price</TableHead>
                 <TableHead className="min-w-[120px]">Duration</TableHead>
+                <TableHead className="min-w-[80px]">Popular</TableHead>
                 <TableHead className="min-w-[200px]">Features</TableHead>
                 <TableHead className="min-w-[120px]">Actions</TableHead>
               </TableRow>
@@ -269,6 +298,14 @@ export default function PackagesAdmin() {
                   <TableCell>{pkg.name}</TableCell>
                   <TableCell>₹{pkg.price}</TableCell>
                   <TableCell>{pkg.duration}</TableCell>
+                  <TableCell>
+                    {pkg.isPopular && (
+                      <Badge className="bg-gradient-to-r from-accent-orange to-orange-600 text-white">
+                        <Star className="w-3 h-3 mr-1 fill-current" />
+                        Popular
+                      </Badge>
+                    )}
+                  </TableCell>
                   <TableCell className="max-w-md">
                     <div className="truncate">{pkg.features.join(', ')}</div>
                   </TableCell>
