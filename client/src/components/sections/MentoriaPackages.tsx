@@ -41,10 +41,10 @@ export function MentoriaPackages() {
   const filteredPackages = packages
     .filter(pkg => pkg.category === selectedCategory)
     .sort((a, b) => {
-      const aIsPremium = a.name.toLowerCase().includes('premium');
-      const bIsPremium = b.name.toLowerCase().includes('premium');
-      if (aIsPremium && !bIsPremium) return 1;
-      if (!aIsPremium && bIsPremium) return -1;
+      const aIsPlus = a.name.toLowerCase().includes('plus');
+      const bIsPlus = b.name.toLowerCase().includes('plus');
+      if (aIsPlus && !bIsPlus) return 1;
+      if (!aIsPlus && bIsPlus) return -1;
       return 0;
     });
 
@@ -98,7 +98,7 @@ export function MentoriaPackages() {
             >
               <Card 
                 className={`h-full glass-effect shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:bg-emerald-500/10 rounded-2xl flex flex-col ${
-                  pkg.name.toLowerCase().includes('premium') 
+                  pkg.name.toLowerCase().includes('plus') 
                     ? 'border-2 border-primary-purple/50 shadow-[0_0_30px_rgba(106,27,154,0.3)]' 
                     : 'border border-card-border'
                 }`}
