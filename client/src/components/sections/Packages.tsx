@@ -7,26 +7,27 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Check, ChevronLeft, ChevronRight, Copy } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Copy, Loader2 } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { QRCodeSVG } from 'qrcode.react';
 import type { Package } from '@shared/schema';
-import { RazorpayButton } from '@/components/RazorpayButton';
 import { sanityClient } from '@/lib/sanity';
 
 import { mockPackages as staticPackages } from '@/lib/mockData';
+
+declare const Razorpay: any;
 
 export function Packages() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
     email: '',
     phone: '',
   });
+  const [couponCode, setCouponCode] = useState('');
   const [sanityPackages, setSanityPackages] = useState<any[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
@@ -36,7 +37,7 @@ export function Packages() {
       try {
         const query = `*[_type == "pricing"] { planId, title, features, displayPrice, category }`;
         const result = await sanityClient.fetch(query);
-        console.log('Sanity Pricing:', result);
+        // console.log('Sanity Pricing:', result); 
         setSanityPackages(result);
       } catch (error) {
         console.error('Error fetching pricing from Sanity:', error);
@@ -57,7 +58,6 @@ export function Packages() {
         ...pkg,
         name: sanityPkg.title || pkg.name,
         features: sanityPkg.features || pkg.features,
-        // We keep price (number) and paymentButtonId from static
       };
     }
     return pkg;
@@ -90,123 +90,109 @@ export function Packages() {
 
   const handleGetStarted = (pkg: Package) => {
     setSelectedPackage(pkg);
+    setCouponCode(''); // Reset coupon
     setIsFormDialogOpen(true);
-  };
-
-
-  const generateUPIUrl = (packageName: string, amount: number) => {
-    const upiId = 'joint.arum@okaxis';
-    const payeeName = 'Claryntia - Urmi Dasgupta';
-    const transactionNote = `Payment for ${packageName}`;
-
-    const params = new URLSearchParams({
-      pa: upiId,
-      pn: payeeName,
-      am: amount.toString(),
-      cu: 'INR',
-      tn: transactionNote
-    });
-
-    return `upi://pay?${params.toString()}`;
   };
 
   const handleProceedToPayment = async () => {
     if (!selectedPackage) return;
 
+    // Validation
     if (!customerInfo.name || !customerInfo.email || !customerInfo.phone) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
+      toast({ title: "Missing Information", description: "Please fill in all required fields", variant: "destructive" });
       return;
     }
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(customerInfo.email)) {
-      toast({
-        title: "Invalid Email",
-        description: "Please enter a valid email address",
-        variant: "destructive",
-      });
+      toast({ title: "Invalid Email", description: "Please enter a valid email address", variant: "destructive" });
       return;
     }
-
     const phoneRegex = /^[0-9]{10}$/;
     if (!phoneRegex.test(customerInfo.phone)) {
-      toast({
-        title: "Invalid Phone",
-        description: "Please enter a valid 10-digit phone number",
-        variant: "destructive",
-      });
+      toast({ title: "Invalid Phone", description: "Please enter a valid 10-digit phone number", variant: "destructive" });
       return;
     }
 
     setIsProcessing(true);
 
-    // Mock successful processing
-    setTimeout(() => {
-      setIsProcessing(false);
-      setIsFormDialogOpen(false);
-      setIsQRDialogOpen(true);
-    }, 1500);
-
-    /*
     try {
-      const response = await fetch('/api/payments', {
+      // 1. Submit Lead (Capture details even if payment fails)
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/submit-lead`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: customerInfo.name,
           email: customerInfo.email,
           phone: customerInfo.phone,
-          packageId: selectedPackage.id,
-          packageName: selectedPackage.name,
-          status: 'pending',
+          message: `Initiated payment for ${selectedPackage.name}`
         }),
       });
 
-      const result = await response.json();
+      // 2. Create Order
+      const orderResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planId: selectedPackage.id,
+          couponCode: couponCode || undefined
+        }),
+      });
 
-      if (!result.success) {
-        throw new Error(result.message || 'Failed to create payment record');
+      const orderData = await orderResponse.json();
+
+      if (!orderResponse.ok || !orderData.success) {
+        throw new Error(orderData.message || 'Failed to create order');
       }
 
-      setIsFormDialogOpen(false);
-      setIsQRDialogOpen(true);
+      // 3. Open Razorpay Checkout
+      const options = {
+        key: orderData.key_id,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: "Claryntia",
+        description: `Payment for ${selectedPackage.name}`,
+        order_id: orderData.order_id,
+        handler: function (response: any) {
+          toast({
+            title: "Payment Successful!",
+            description: "We have received your payment. You will receive a confirmation email shortly.",
+          });
+          setIsFormDialogOpen(false);
+          setCustomerInfo({ name: '', email: '', phone: '' });
+          // Ideally, verify signature here or trust webhook
+        },
+        prefill: {
+          name: customerInfo.name,
+          email: customerInfo.email,
+          contact: customerInfo.phone,
+        },
+        theme: {
+          color: "#9b87f5", // Primary Purple
+        },
+        modal: {
+          ondismiss: function () {
+            setIsProcessing(false);
+          }
+        }
+      };
 
-    } catch (error) {
-      console.error('Payment error:', error);
+      const rzp1 = new Razorpay(options);
+      rzp1.open();
+
+      // Note: isProcessing stays true until modal dismissed or payment handled, 
+      // but Razorpay modal handles its own state. We can turn it off after open? 
+      // Better to keep it on processing until handler or dismiss.
+      // We rely on ondismiss above.
+
+    } catch (error: any) {
+      console.error('Payment Error:', error);
       toast({
-        title: "Error",
-        description: "Failed to process request. Please try again.",
+        title: "Payment Failed",
+        description: error.message || "An error occurred during payment initialization.",
         variant: "destructive",
       });
-    } finally {
       setIsProcessing(false);
     }
-    */
-  };
-
-  const handleCopyUPI = () => {
-    navigator.clipboard.writeText('joint.arum@okaxis');
-    toast({
-      title: "Copied!",
-      description: "UPI ID copied to clipboard",
-    });
-  };
-
-  const handleCloseQRDialog = () => {
-    setIsQRDialogOpen(false);
-    setCustomerInfo({ name: '', email: '', phone: '' });
-    setSelectedPackage(null);
-
-    toast({
-      title: "Thank you!",
-      description: "We've recorded your details. Please complete the payment and we'll contact you shortly.",
-    });
   };
 
   return (
@@ -277,19 +263,13 @@ export function Packages() {
                       </CardContent>
 
                       <CardFooter className="pt-4 flex justify-center">
-                        {pkg.paymentButtonId ? (
-                          <div className="w-full">
-                            <RazorpayButton paymentButtonId={pkg.paymentButtonId} />
-                          </div>
-                        ) : (
-                          <Button
-                            onClick={() => handleGetStarted(pkg)}
-                            className="w-full rounded-full py-6 bg-primary-purple text-white"
-                            data-testid={`button-get-started-${index}`}
-                          >
-                            Book Now
-                          </Button>
-                        )}
+                        <Button
+                          onClick={() => handleGetStarted(pkg)}
+                          className="w-full rounded-full py-6 bg-primary-purple text-white hover:bg-primary-purple/90 transition-colors"
+                          data-testid={`button-get-started-${index}`}
+                        >
+                          Book Now
+                        </Button>
                       </CardFooter>
                     </Card>
                   </div>
@@ -375,6 +355,18 @@ export function Packages() {
                 data-testid="input-customer-phone"
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="coupon">Coupon Code (Optional)</Label>
+              <Input
+                id="coupon"
+                type="text"
+                placeholder="Enter coupon code"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value.toUpperCase())} // Force uppercase
+                data-testid="input-coupon"
+              />
+            </div>
           </div>
 
           <DialogFooter>
@@ -392,81 +384,14 @@ export function Packages() {
               className="bg-primary-purple text-white"
               data-testid="button-proceed-payment"
             >
-              {isProcessing ? 'Processing...' : 'Proceed to Payment'}
+              {isProcessing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : 'Proceed to Payment'}
             </Button>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* UPI QR Code Dialog */}
-      <Dialog open={isQRDialogOpen} onOpenChange={setIsQRDialogOpen}>
-        <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[95vh] overflow-y-auto" data-testid="dialog-qr-code">
-          <DialogHeader>
-            <DialogTitle className="text-center text-lg sm:text-xl">Scan to Pay</DialogTitle>
-            {selectedPackage && (
-              <div className="space-y-1 sm:space-y-2 text-center">
-                <p className="font-semibold text-base sm:text-lg line-clamp-2">{selectedPackage.name}</p>
-                <p className="text-xl sm:text-2xl font-bold text-primary-purple">₹{selectedPackage.price.toLocaleString('en-IN')}</p>
-              </div>
-            )}
-          </DialogHeader>
-
-          <div className="flex flex-col items-center space-y-4 sm:space-y-6 py-2 sm:py-4">
-            {/* QR Code */}
-            <div className="bg-white p-3 sm:p-6 rounded-2xl shadow-lg w-fit">
-              <QRCodeSVG
-                id="upi-qr-code"
-                value={selectedPackage ? generateUPIUrl(selectedPackage.name, selectedPackage.price) : ''}
-                size={window.innerWidth < 640 ? 200 : 240}
-                level="H"
-                includeMargin={true}
-              />
-            </div>
-
-            {/* UPI ID */}
-            <div className="w-full space-y-2">
-              <Label className="text-xs sm:text-sm text-muted-foreground">UPI ID</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  value="joint.arum@okaxis"
-                  readOnly
-                  className="flex-1 font-mono text-xs sm:text-sm"
-                  data-testid="input-upi-id"
-                />
-                <Button
-                  size="icon"
-                  variant="outline"
-                  onClick={handleCopyUPI}
-                  data-testid="button-copy-upi"
-                >
-                  <Copy className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-
-            {/* Instructions */}
-            <div className="w-full space-y-2 sm:space-y-3 bg-muted/50 p-3 sm:p-4 rounded-lg">
-              <h4 className="font-semibold text-xs sm:text-sm">Payment Instructions:</h4>
-              <ol className="text-xs sm:text-sm space-y-1.5 sm:space-y-2 text-muted-foreground list-decimal list-inside">
-                <li>Open any UPI app (Google Pay, PhonePe, Paytm, etc.)</li>
-                <li>Scan the QR code or enter the UPI ID</li>
-                <li>Verify the amount: ₹{selectedPackage?.price.toLocaleString('en-IN')}</li>
-                <li>Complete the payment</li>
-                <li className="break-words">We'll contact you shortly at {customerInfo.email}</li>
-              </ol>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex w-full">
-              <Button
-                onClick={handleCloseQRDialog}
-                className="w-full bg-primary-purple text-white text-sm"
-                data-testid="button-close-qr"
-              >
-                Done
-              </Button>
-            </div>
-          </div>
         </DialogContent>
       </Dialog>
     </section>
