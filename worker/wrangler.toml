@@ -1,0 +1,11 @@
+name = "claryntia-worker"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "claryntia-prod"
+database_id = "373c906c-d57c-4657-9570-1b6fea438c79"
+
+[observability]
+enabled = true

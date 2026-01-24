@@ -68,21 +68,8 @@ export function Contact() {
   const onSubmit = async (data: ContactFormValues) => {
     setIsSubmitting(true);
 
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    // Mock success
-    toast({
-      title: 'Message Sent Successfully!',
-      description: 'We\'ll get back to you within 24 hours.',
-    });
-
-    form.reset();
-    setIsSubmitting(false);
-
-    /*
     try {
-      const response = await fetch('/api/contact', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/submit-lead`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -91,18 +78,19 @@ export function Contact() {
       });
 
       const result = await response.json();
-      
+
       if (response.ok && result.success) {
         toast({
           title: 'Message Sent Successfully!',
           description: 'We\'ll get back to you within 24 hours.',
         });
-        
+
         form.reset();
       } else {
         throw new Error(result.message || 'Submission failed');
       }
     } catch (error) {
+      console.error('Contact submission error:', error);
       toast({
         title: 'Error',
         description: 'Something went wrong. Please try again.',
@@ -111,7 +99,6 @@ export function Contact() {
     } finally {
       setIsSubmitting(false);
     }
-    */
   };
 
   return (
