@@ -57,7 +57,7 @@ app.post('/submit-lead', async (c) => {
         // Insert into D1
         const { success } = await c.env.DB.prepare(
             `INSERT INTO leads (name, email, phone, message, created_at) VALUES (?, ?, ?, ?, ?)`
-        ).bind(name, email, phone || null, message || null, Date.now()).run()
+        ).bind(name, email, phone || null, message || null, Math.floor(Date.now() / 1000)).run()
 
         if (success) {
             return c.json({ success: true, message: 'Lead captured successfully' })

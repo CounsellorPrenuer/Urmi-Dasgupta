@@ -2,12 +2,11 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards';
-import { mockTestimonials as fallbackTestimonials } from '@/lib/mockData';
 import { sanityClient } from '@/lib/sanity';
 
 export function Testimonials() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
-  const [sanityTestimonials, setSanityTestimonials] = useState<any[] | null>(null);
+  const [sanityTestimonials, setSanityTestimonials] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -36,9 +35,7 @@ export function Testimonials() {
     );
   }
 
-  const testimonials = (sanityTestimonials && sanityTestimonials.length > 0)
-    ? sanityTestimonials
-    : fallbackTestimonials;
+  const testimonials = sanityTestimonials;
 
   const items = testimonials.map((testimonial: any) => ({
     quote: testimonial.content,

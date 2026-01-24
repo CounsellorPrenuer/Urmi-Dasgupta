@@ -160,7 +160,7 @@ export function MentoriaPackages() {
 
                 <CardHeader className="space-y-2">
                   <CardTitle className="font-serif text-2xl text-accent-orange">{pkg.name}</CardTitle>
-                  <div className="text-sm text-muted-foreground">{pkg.category}</div>
+                  <div className="text-sm text-muted-foreground capitalize">{pkg.category}</div>
                   <div className="pt-2">
                     <div className="text-3xl font-bold text-primary-purple">
                       ₹{pkg.price.toLocaleString()}
