@@ -12,6 +12,9 @@ import { Check, ChevronLeft, ChevronRight, Copy } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { QRCodeSVG } from 'qrcode.react';
 import type { Package } from '@shared/schema';
+import { RazorpayButton } from '@/components/RazorpayButton';
+
+import { mockPackages } from '@/lib/mockData';
 
 export function Packages() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
@@ -26,9 +29,8 @@ export function Packages() {
   });
   const { toast } = useToast();
 
-  const { data: packages = [], isLoading } = useQuery<Package[]>({
-    queryKey: ['/api/packages'],
-  });
+  const packages = mockPackages;
+  const isLoading = false;
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
@@ -110,6 +112,14 @@ export function Packages() {
 
     setIsProcessing(true);
 
+    // Mock successful processing
+    setTimeout(() => {
+      setIsProcessing(false);
+      setIsFormDialogOpen(false);
+      setIsQRDialogOpen(true);
+    }, 1500);
+
+    /*
     try {
       const response = await fetch('/api/payments', {
         method: 'POST',
@@ -145,6 +155,7 @@ export function Packages() {
     } finally {
       setIsProcessing(false);
     }
+    */
   };
 
   const handleCopyUPI = () => {
@@ -233,14 +244,20 @@ export function Packages() {
                         </ul>
                       </CardContent>
 
-                      <CardFooter>
-                        <Button
-                          onClick={() => handleGetStarted(pkg)}
-                          className="w-full rounded-full py-6 bg-primary-purple text-white"
-                          data-testid={`button-get-started-${index}`}
-                        >
-                          Book Now
-                        </Button>
+                      <CardFooter className="pt-4 flex justify-center">
+                        {pkg.paymentButtonId ? (
+                          <div className="w-full">
+                            <RazorpayButton paymentButtonId={pkg.paymentButtonId} />
+                          </div>
+                        ) : (
+                          <Button
+                            onClick={() => handleGetStarted(pkg)}
+                            className="w-full rounded-full py-6 bg-primary-purple text-white"
+                            data-testid={`button-get-started-${index}`}
+                          >
+                            Book Now
+                          </Button>
+                        )}
                       </CardFooter>
                     </Card>
                   </div>

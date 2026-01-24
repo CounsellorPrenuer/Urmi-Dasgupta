@@ -67,7 +67,20 @@ export function Contact() {
 
   const onSubmit = async (data: ContactFormValues) => {
     setIsSubmitting(true);
-    
+
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // Mock success
+    toast({
+      title: 'Message Sent Successfully!',
+      description: 'We\'ll get back to you within 24 hours.',
+    });
+
+    form.reset();
+    setIsSubmitting(false);
+
+    /*
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
@@ -98,6 +111,7 @@ export function Contact() {
     } finally {
       setIsSubmitting(false);
     }
+    */
   };
 
   return (

@@ -1,21 +1,19 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { useQuery } from '@tanstack/react-query';
 import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards';
-import type { Testimonial } from '@shared/schema';
+import { mockTestimonials } from '@/lib/mockData';
 
 export function Testimonials() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
-  
-  const { data: testimonials = [], isLoading } = useQuery<Testimonial[]>({
-    queryKey: ['/api/testimonials'],
-  });
+
+  const testimonials = mockTestimonials;
+  const isLoading = false;
 
   const items = testimonials.map((testimonial) => ({
     quote: testimonial.content,
     name: testimonial.name,
-    title: testimonial.rating > 0 && testimonial.rating <= 5 
-      ? Array.from({ length: testimonial.rating }).map(() => '⭐').join('') 
+    title: testimonial.rating > 0 && testimonial.rating <= 5
+      ? Array.from({ length: testimonial.rating }).map(() => '⭐').join('')
       : '',
     imageUrl: testimonial.imageUrl || undefined,
   }));

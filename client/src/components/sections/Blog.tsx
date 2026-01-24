@@ -17,21 +17,22 @@ const gradients = [
   'from-primary-purple/20 to-accent-orange/20',
 ];
 
+import { mockBlogs } from '@/lib/mockData';
+
 export function Blog() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
   const [selectedBlog, setSelectedBlog] = useState<BlogType | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  const { data: blogPosts = [], isLoading } = useQuery<BlogType[]>({
-    queryKey: ['/api/blogs'],
-  });
 
-  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+  const blogPosts = mockBlogs;
+  const isLoading = false;
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     align: 'start',
     containScroll: 'trimSnaps'
   });
-  
+
   const [prevBtnEnabled, setPrevBtnEnabled] = useState(false);
   const [nextBtnEnabled, setNextBtnEnabled] = useState(false);
 
@@ -58,10 +59,10 @@ export function Blog() {
 
   const formatDate = (date: Date | string) => {
     const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return dateObj.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    return dateObj.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
   };
 
@@ -104,7 +105,7 @@ export function Blog() {
                     key={post.id}
                     className="flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-12px)] lg:flex-[0_0_calc(33.333%-16px)]"
                   >
-                    <Card 
+                    <Card
                       className="h-full flex flex-col glass-effect border border-card-border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:bg-accent-orange/10 rounded-2xl overflow-hidden group cursor-pointer"
                       data-testid={`card-blog-${index}`}
                       onClick={() => handleReadMore(post)}
@@ -195,9 +196,9 @@ export function Blog() {
               <ScrollArea className="max-h-[60vh] pr-4">
                 {selectedBlog.imageUrl && (
                   <div className="mb-6 rounded-lg overflow-hidden">
-                    <img 
-                      src={selectedBlog.imageUrl} 
-                      alt={selectedBlog.title} 
+                    <img
+                      src={selectedBlog.imageUrl}
+                      alt={selectedBlog.title}
                       className="w-full h-64 object-cover"
                     />
                   </div>
@@ -206,7 +207,7 @@ export function Blog() {
                   <p className="text-lg text-muted-foreground mb-6 font-medium">
                     {selectedBlog.excerpt}
                   </p>
-                  <div 
+                  <div
                     className="text-foreground whitespace-pre-wrap leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: selectedBlog.content }}
                   />

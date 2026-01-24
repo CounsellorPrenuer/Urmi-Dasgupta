@@ -56,6 +56,18 @@ export function MentoriaPaymentModal({ open, onOpenChange, package: pkg }: Mento
   const onSubmit = async (data: PaymentFormValues) => {
     setIsProcessing(true);
 
+    // Simulate basic delay
+    setTimeout(() => {
+      toast({
+        title: 'Payment Successful!',
+        description: 'Thank you for your purchase. We will contact you shortly.',
+      });
+      form.reset();
+      onOpenChange(false);
+      setIsProcessing(false);
+    }, 1500);
+
+    /*
     try {
       const res = await loadRazorpay();
       if (!res) {
@@ -165,6 +177,7 @@ export function MentoriaPaymentModal({ open, onOpenChange, package: pkg }: Mento
       });
       setIsProcessing(false);
     }
+    */
   };
 
   return (

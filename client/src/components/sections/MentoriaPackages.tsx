@@ -16,15 +16,16 @@ const categories = [
   'Working Professionals'
 ];
 
+import { mockMentoriaPackages } from '@/lib/mockData';
+
 export function MentoriaPackages() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
   const [selectedPackage, setSelectedPackage] = useState<MentoriaPackage | null>(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>(categories[0]);
 
-  const { data: packages, isLoading } = useQuery<MentoriaPackage[]>({
-    queryKey: ["/api/mentoria-packages/active"],
-  });
+  const packages = mockMentoriaPackages;
+  const isLoading = false;
 
   const handleBookNow = (pkg: MentoriaPackage) => {
     setSelectedPackage(pkg);
@@ -76,11 +77,10 @@ export function MentoriaPackages() {
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`px-6 py-2.5 rounded-full font-medium text-sm transition-all duration-300 ${
-                selectedCategory === category
+              className={`px-6 py-2.5 rounded-full font-medium text-sm transition-all duration-300 ${selectedCategory === category
                   ? 'bg-primary-purple text-white shadow-lg scale-105'
                   : 'bg-card hover-elevate text-foreground'
-              }`}
+                }`}
               data-testid={`button-category-${category.toLowerCase().replace(/\s+/g, '-')}`}
             >
               {category.toUpperCase()}
@@ -97,12 +97,11 @@ export function MentoriaPackages() {
               transition={{ duration: 0.6, delay: index * 0.1 }}
               className="w-full md:max-w-[calc(50%_-_0.75rem)] lg:max-w-[calc(33.333%_-_1rem)]"
             >
-              <Card 
-                className={`h-full glass-effect shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:bg-emerald-500/10 rounded-2xl flex flex-col relative ${
-                  pkg.name.toLowerCase().includes('plus') 
-                    ? 'border-2 border-primary-purple/50 shadow-[0_0_30px_rgba(106,27,154,0.3)]' 
+              <Card
+                className={`h-full glass-effect shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:bg-emerald-500/10 rounded-2xl flex flex-col relative ${pkg.name.toLowerCase().includes('plus')
+                    ? 'border-2 border-primary-purple/50 shadow-[0_0_30px_rgba(106,27,154,0.3)]'
                     : 'border border-card-border'
-                }`}
+                  }`}
                 data-testid={`card-mentoria-package-${pkg.id}`}
               >
                 {pkg.name.toLowerCase().includes('plus') && (
@@ -113,7 +112,7 @@ export function MentoriaPackages() {
                     </Badge>
                   </div>
                 )}
-                
+
                 <CardHeader className="space-y-2">
                   <CardTitle className="font-serif text-2xl text-accent-orange">{pkg.name}</CardTitle>
                   <div className="text-sm text-muted-foreground">{pkg.category}</div>
