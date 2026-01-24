@@ -1,32 +1,38 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { GraduationCap, Briefcase, Building2, Heart, Lightbulb, Users, Sparkles, BookOpen } from 'lucide-react';
+import { sanityClient } from '@/lib/sanity';
 
-const services = [
+const fallbackServices = [
   {
     icon: GraduationCap,
     title: 'Career Clarity & Guidance',
     description: 'For Students & Professionals. Structured counselling via Mentoria\'s certified platform.',
     color: 'text-blue-500',
+    iconName: 'GraduationCap'
   },
   {
     icon: Heart,
     title: 'Relationship Healing & Coaching',
     description: '1:1 personalized sessions to break repeating emotional cycles.',
     color: 'text-pink-500',
+    iconName: 'Heart'
   },
   {
     icon: Sparkles,
     title: 'Energy Reading & Graphotherapy',
     description: 'Decode subconscious through handwriting & vibrational patterns.',
     color: 'text-yellow-500',
+    iconName: 'Sparkles'
   },
   {
     icon: BookOpen,
     title: 'Workshops & Seminars',
     description: 'For schools, colleges, and corporates — topics on wellbeing, communication & clarity.',
     color: 'text-green-500',
+    iconName: 'BookOpen'
   },
 ];
 
@@ -57,8 +63,48 @@ const pillars = [
   },
 ];
 
+const iconMap: Record<string, any> = {
+  GraduationCap, Briefcase, Building2, Heart, Lightbulb, Users, Sparkles, BookOpen
+};
+
 export function Services() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
+  const [sanityServices, setSanityServices] = useState<any[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const query = `*[_type == "service"] { title, description, icon }`;
+        const result = await sanityClient.fetch(query);
+        console.log('Sanity Services:', result);
+        setSanityServices(result);
+      } catch (error) {
+        console.error('Error fetching services from Sanity:', error);
+        setSanityServices([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <section id="services" className="py-24 md:py-32 bg-background min-h-[50vh] flex items-center justify-center">
+        <div className="text-muted-foreground animate-pulse">Loading services...</div>
+      </section>
+    );
+  }
+
+  const services = (sanityServices && sanityServices.length > 0)
+    ? sanityServices.map((s: any) => ({
+      ...s,
+      icon: iconMap[s.icon] || Sparkles, // Fallback icon
+      color: fallbackServices.find(fs => fs.title === s.title)?.color || 'text-primary-purple' // Attempt to preserve color or default
+    }))
+    : fallbackServices;
 
   return (
     <section id="services" className="py-24 md:py-32 bg-background" ref={ref}>
@@ -78,7 +124,7 @@ export function Services() {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-24">
-          {services.map((service, index) => (
+          {services.map((service: any, index: number) => (
             <motion.div
               key={service.title}
               initial={{ opacity: 0, y: 30 }}
@@ -91,7 +137,7 @@ export function Services() {
                 <div className="absolute inset-0 glass-effect opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl pointer-events-none" />
                 <CardHeader className="space-y-0 pb-4 relative z-10">
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center mb-4">
-                    <service.icon className={`w-7 h-7 ${service.color}`} />
+                    <service.icon className={`w-7 h-7 ${service.color || 'text-primary-purple'}`} />
                   </div>
                   <CardTitle className="font-serif text-xl text-white group-hover:text-primary-purple transition-colors">{service.title}</CardTitle>
                 </CardHeader>

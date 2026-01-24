@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -13,8 +12,9 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { QRCodeSVG } from 'qrcode.react';
 import type { Package } from '@shared/schema';
 import { RazorpayButton } from '@/components/RazorpayButton';
+import { sanityClient } from '@/lib/sanity';
 
-import { mockPackages } from '@/lib/mockData';
+import { mockPackages as staticPackages } from '@/lib/mockData';
 
 export function Packages() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
@@ -27,10 +27,41 @@ export function Packages() {
     email: '',
     phone: '',
   });
+  const [sanityPackages, setSanityPackages] = useState<any[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  const packages = mockPackages;
-  const isLoading = false;
+  useEffect(() => {
+    const fetchPricing = async () => {
+      try {
+        const query = `*[_type == "pricing"] { planId, title, features, displayPrice, category }`;
+        const result = await sanityClient.fetch(query);
+        console.log('Sanity Pricing:', result);
+        setSanityPackages(result);
+      } catch (error) {
+        console.error('Error fetching pricing from Sanity:', error);
+        setSanityPackages([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPricing();
+  }, []);
+
+  // Merge Sanity data with static packages (SAFETY: payment IDs come from static)
+  const packages = staticPackages.map(pkg => {
+    const sanityPkg = sanityPackages?.find((sp: any) => sp.planId === pkg.id);
+    if (sanityPkg) {
+      return {
+        ...pkg,
+        name: sanityPkg.title || pkg.name,
+        features: sanityPkg.features || pkg.features,
+        // We keep price (number) and paymentButtonId from static
+      };
+    }
+    return pkg;
+  });
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
@@ -61,6 +92,7 @@ export function Packages() {
     setSelectedPackage(pkg);
     setIsFormDialogOpen(true);
   };
+
 
   const generateUPIUrl = (packageName: string, amount: number) => {
     const upiId = 'joint.arum@okaxis';

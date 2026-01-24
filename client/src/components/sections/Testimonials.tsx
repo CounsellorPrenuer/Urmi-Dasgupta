@@ -1,20 +1,51 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards';
-import { mockTestimonials } from '@/lib/mockData';
+import { mockTestimonials as fallbackTestimonials } from '@/lib/mockData';
+import { sanityClient } from '@/lib/sanity';
 
 export function Testimonials() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
+  const [sanityTestimonials, setSanityTestimonials] = useState<any[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const testimonials = mockTestimonials;
-  const isLoading = false;
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const query = `*[_type == "testimonial"] { name, role, content, rating }`;
+        const result = await sanityClient.fetch(query);
+        console.log('Sanity Testimonials:', result);
+        setSanityTestimonials(result);
+      } catch (error) {
+        console.error('Error fetching testimonials from Sanity:', error);
+        setSanityTestimonials([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const items = testimonials.map((testimonial) => ({
+    fetchTestimonials();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <section className="py-24 md:py-32 bg-background min-h-[300px] flex items-center justify-center">
+        <div className="text-muted-foreground animate-pulse">Loading testimonials...</div>
+      </section>
+    );
+  }
+
+  const testimonials = (sanityTestimonials && sanityTestimonials.length > 0)
+    ? sanityTestimonials
+    : fallbackTestimonials;
+
+  const items = testimonials.map((testimonial: any) => ({
     quote: testimonial.content,
     name: testimonial.name,
-    title: testimonial.rating > 0 && testimonial.rating <= 5
+    title: testimonial.role || (testimonial.rating > 0 && testimonial.rating <= 5
       ? Array.from({ length: testimonial.rating }).map(() => '⭐').join('')
-      : '',
+      : ''),
     imageUrl: testimonial.imageUrl || undefined,
   }));
 
@@ -35,11 +66,7 @@ export function Testimonials() {
           </p>
         </motion.div>
 
-        {isLoading ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Loading testimonials...</p>
-          </div>
-        ) : testimonials.length === 0 ? (
+        {testimonials.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">No testimonials available at the moment.</p>
           </div>
