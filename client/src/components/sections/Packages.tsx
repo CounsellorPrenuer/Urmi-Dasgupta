@@ -13,7 +13,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import type { Package } from '@shared/schema';
 import { sanityClient } from '@/lib/sanity';
 
-import { mockPackages as staticPackages } from '@/lib/mockData';
+// Removed static import to enforce Sanity as Single Source of Truth
 
 declare const Razorpay: any;
 
@@ -28,7 +28,7 @@ export function Packages() {
     phone: '',
   });
   const [couponCode, setCouponCode] = useState('');
-  const [sanityPackages, setSanityPackages] = useState<any[] | null>(null);
+  const [sanityPackages, setSanityPackages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -51,9 +51,12 @@ export function Packages() {
             name: pkg.title,
             features: pkg.features || []
           })));
+        } else {
+          setSanityPackages([]);
         }
       } catch (error) {
         console.error('Error fetching pricing from Sanity:', error);
+        setSanityPackages([]);
       } finally {
         setIsLoading(false);
       }
@@ -62,10 +65,8 @@ export function Packages() {
     fetchPricing();
   }, []);
 
-  // Source of Truth: Sanity -> Static Fallback
-  const packages = (sanityPackages && sanityPackages.length > 0)
-    ? sanityPackages
-    : staticPackages;
+  // Source of Truth: Sanity ONLY. No fallback.
+  const packages = sanityPackages;
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,

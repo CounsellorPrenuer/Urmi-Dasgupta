@@ -24,14 +24,14 @@ const categoryMapping: Record<string, string> = {
 };
 
 import { sanityClient } from '@/lib/sanity';
-import { mockMentoriaPackages as staticPackages } from '@/lib/mockData';
+// Removed static import
 
 export function MentoriaPackages() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
   const [selectedPackage, setSelectedPackage] = useState<MentoriaPackage | null>(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>(categories[0]);
-  const [sanityPackages, setSanityPackages] = useState<any[] | null>(null);
+  const [sanityPackages, setSanityPackages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -58,9 +58,12 @@ export function MentoriaPackages() {
             // Ensure we have a subgroup even if missing in old data (fallback logic not needed if entered correctly)
             subgroup: pkg.subgroup
           })));
+        } else {
+          setSanityPackages([]);
         }
       } catch (error) {
         console.error('Error fetching Mentoria packages:', error);
+        setSanityPackages([]);
       } finally {
         setIsLoading(false);
       }
@@ -69,9 +72,7 @@ export function MentoriaPackages() {
     fetchPricing();
   }, []);
 
-  const packages = (sanityPackages && sanityPackages.length > 0)
-    ? sanityPackages
-    : staticPackages;
+  const packages = sanityPackages;
 
   const handleBookNow = (pkg: MentoriaPackage) => {
     setSelectedPackage(pkg);
