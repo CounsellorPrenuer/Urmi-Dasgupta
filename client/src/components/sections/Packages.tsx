@@ -35,13 +35,25 @@ export function Packages() {
   useEffect(() => {
     const fetchPricing = async () => {
       try {
-        const query = `*[_type == "pricing"] { planId, title, features, displayPrice, category }`;
+        const query = `*[_type == "pricing" && (category == "general" || !defined(category))] | order(order asc) {
+          planId,
+          title,
+          description,
+          price,
+          features,
+          "id": planId
+        }`;
         const result = await sanityClient.fetch(query);
-        // console.log('Sanity Pricing:', result); 
-        setSanityPackages(result);
+        if (result && result.length > 0) {
+          setSanityPackages(result.map((pkg: any) => ({
+            ...pkg,
+            name: pkg.title, // Standardize naming
+            // Ensure features is array
+            features: pkg.features || []
+          })));
+        }
       } catch (error) {
         console.error('Error fetching pricing from Sanity:', error);
-        setSanityPackages([]);
       } finally {
         setIsLoading(false);
       }
@@ -50,18 +62,10 @@ export function Packages() {
     fetchPricing();
   }, []);
 
-  // Merge Sanity data with static packages (SAFETY: payment IDs come from static)
-  const packages = staticPackages.map(pkg => {
-    const sanityPkg = sanityPackages?.find((sp: any) => sp.planId === pkg.id);
-    if (sanityPkg) {
-      return {
-        ...pkg,
-        name: sanityPkg.title || pkg.name,
-        features: sanityPkg.features || pkg.features,
-      };
-    }
-    return pkg;
-  });
+  // Source of Truth: Sanity -> Static Fallback
+  const packages = (sanityPackages && sanityPackages.length > 0)
+    ? sanityPackages
+    : staticPackages;
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,

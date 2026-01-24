@@ -19,10 +19,23 @@ export default defineType({
             validation: (Rule) => Rule.required(),
         }),
         defineField({
-            name: 'displayPrice',
-            title: 'Display Price',
-            type: 'string',
-            description: 'Formatted price string (e.g., "₹499")',
+            name: 'description',
+            title: 'Description',
+            type: 'text',
+            rows: 2,
+        }),
+        defineField({
+            name: 'price',
+            title: 'Price (Numeric)',
+            type: 'number',
+            description: 'Used for payment calculations (e.g. 5500)',
+            validation: (Rule) => Rule.required().min(0),
+        }),
+        defineField({
+            name: 'isPopular',
+            title: 'Is Popular?',
+            type: 'boolean',
+            initialValue: false,
         }),
         defineField({
             name: 'features',
@@ -36,10 +49,19 @@ export default defineType({
             type: 'string',
             options: {
                 list: [
-                    { title: 'Individual', value: 'individual' },
-                    { title: 'Business', value: 'business' },
+                    { title: 'Claryntia: General', value: 'general' },
+                    { title: 'Mentoria: 8-9 Students', value: '8-9 Students' },
+                    { title: 'Mentoria: 10-12 Students', value: '10-12 Students' },
+                    { title: 'Mentoria: College Graduates', value: 'College Graduates' },
+                    { title: 'Mentoria: Working Professionals', value: 'Working Professionals' },
                 ],
             },
+        }),
+        defineField({
+            name: 'order',
+            title: 'Display Order',
+            type: 'number',
+            initialValue: 0,
         }),
     ],
 })
