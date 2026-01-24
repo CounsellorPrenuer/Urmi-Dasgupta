@@ -35,11 +35,12 @@ export function Packages() {
   useEffect(() => {
     const fetchPricing = async () => {
       try {
-        const query = `*[_type == "pricing" && (category == "general" || !defined(category))] | order(order asc) {
+        const query = `*[_type == "pricing" && category == "packages"] | order(order asc) {
           planId,
           title,
           description,
           price,
+          duration,
           features,
           "id": planId
         }`;
@@ -47,8 +48,7 @@ export function Packages() {
         if (result && result.length > 0) {
           setSanityPackages(result.map((pkg: any) => ({
             ...pkg,
-            name: pkg.title, // Standardize naming
-            // Ensure features is array
+            name: pkg.title,
             features: pkg.features || []
           })));
         }

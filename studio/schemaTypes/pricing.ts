@@ -44,16 +44,34 @@ export default defineType({
             of: [{ type: 'string' }],
         }),
         defineField({
+            name: 'duration',
+            title: 'Duration',
+            type: 'string',
+            description: 'e.g., "60 mins" or "3 Months"',
+        }),
+        defineField({
             name: 'category',
-            title: 'Category',
+            title: 'Category (Section)',
             type: 'string',
             options: {
                 list: [
-                    { title: 'Claryntia: General', value: 'general' },
-                    { title: 'Mentoria: 8-9 Students', value: '8-9 Students' },
-                    { title: 'Mentoria: 10-12 Students', value: '10-12 Students' },
-                    { title: 'Mentoria: College Graduates', value: 'College Graduates' },
-                    { title: 'Mentoria: Working Professionals', value: 'Working Professionals' },
+                    { title: 'Packages', value: 'packages' },
+                    { title: 'Mentoria Packages', value: 'mentoria' },
+                ],
+            },
+            validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+            name: 'subgroup',
+            title: 'Subgroup (Mentoria Tabs)',
+            type: 'string',
+            hidden: ({ document }) => document?.category !== 'mentoria',
+            options: {
+                list: [
+                    { title: '8-9 Students', value: '8-9 students' },
+                    { title: '10-12 Students', value: '10-12 students' },
+                    { title: 'College Graduates', value: 'graduates' },
+                    { title: 'Working Professionals', value: 'working professionals' },
                 ],
             },
         }),

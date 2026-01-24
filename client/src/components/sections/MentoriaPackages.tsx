@@ -16,6 +16,13 @@ const categories = [
   'Working Professionals'
 ];
 
+const categoryMapping: Record<string, string> = {
+  '8-9 Students': '8-9 students',
+  '10-12 Students': '10-12 students',
+  'College Graduates': 'graduates',
+  'Working Professionals': 'working professionals'
+};
+
 import { sanityClient } from '@/lib/sanity';
 import { mockMentoriaPackages as staticPackages } from '@/lib/mockData';
 
@@ -30,12 +37,13 @@ export function MentoriaPackages() {
   useEffect(() => {
     const fetchPricing = async () => {
       try {
-        const query = `*[_type == "pricing" && category != "general" && defined(category)] | order(order asc) {
+        const query = `*[_type == "pricing" && category == "mentoria"] | order(order asc) {
           planId,
           title,
           description,
           price,
           category,
+          subgroup,
           features,
           isPopular,
           "id": planId
@@ -46,7 +54,9 @@ export function MentoriaPackages() {
             ...pkg,
             name: pkg.title,
             features: pkg.features || [],
-            isActive: true
+            isActive: true,
+            // Ensure we have a subgroup even if missing in old data (fallback logic not needed if entered correctly)
+            subgroup: pkg.subgroup
           })));
         }
       } catch (error) {
@@ -74,7 +84,15 @@ export function MentoriaPackages() {
   }
 
   const filteredPackages = (packages || [])
-    .filter((pkg: any) => pkg.category === selectedCategory);
+    .filter((pkg: any) => {
+      // Sanity check: compare mapped subgroup OR fallback to old 'category' field for static data
+      const targetSubgroup = categoryMapping[selectedCategory];
+      if (pkg.subgroup) {
+        return pkg.subgroup === targetSubgroup;
+      }
+      // Fallback for static (which uses 'category' property with UI label values)
+      return pkg.category === selectedCategory;
+    });
 
   return (
     <section id="mentoria-packages" className="py-24 md:py-32 bg-gradient-to-br from-primary-purple/5 via-background to-secondary-blue/5" ref={ref}>
