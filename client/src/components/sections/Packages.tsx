@@ -7,20 +7,24 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Check, ChevronLeft, ChevronRight, Copy, Loader2 } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Copy, Loader2, QrCode } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
-import { QRCodeSVG } from 'qrcode.react';
 import type { Package } from '@shared/schema';
 import { sanityClient } from '@/lib/sanity';
+import imageUrlBuilder from '@sanity/image-url';
 
-// Removed static import to enforce Sanity as Single Source of Truth
+const builder = imageUrlBuilder(sanityClient);
+function urlFor(source: any) {
+  return builder.image(source);
+}
 
 declare const Razorpay: any;
 
 export function Packages() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
-  const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
+  const [selectedPackage, setSelectedPackage] = useState<any | null>(null);
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
@@ -35,13 +39,15 @@ export function Packages() {
   useEffect(() => {
     const fetchPricing = async () => {
       try {
-        const query = `*[_type == "pricing" && category == "packages"] | order(order asc) {
+        const query = `*[_type == "pricing" && category == "healing"] | order(order asc) {
           planId,
           title,
           description,
           price,
           duration,
           features,
+          paymentType,
+          qrImage,
           "id": planId
         }`;
         const result = await sanityClient.fetch(query);
@@ -65,7 +71,7 @@ export function Packages() {
     fetchPricing();
   }, []);
 
-  // Source of Truth: Sanity ONLY. No fallback.
+  // Source of Truth: Sanity ONLY.
   const packages = sanityPackages;
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -93,35 +99,30 @@ export function Packages() {
     emblaApi.on('reInit', onSelect);
   }, [emblaApi, onSelect]);
 
-  const handleGetStarted = (pkg: Package) => {
+  const handleGetStarted = (pkg: any) => {
     setSelectedPackage(pkg);
-    setCouponCode(''); // Reset coupon
-    setIsFormDialogOpen(true);
+    if (pkg.paymentType === 'qr') {
+      setIsQRDialogOpen(true);
+    } else {
+      setCouponCode('');
+      setIsFormDialogOpen(true);
+    }
   };
 
   const handleProceedToPayment = async () => {
     if (!selectedPackage) return;
 
-    // Validation
     if (!customerInfo.name || !customerInfo.email || !customerInfo.phone) {
       toast({ title: "Missing Information", description: "Please fill in all required fields", variant: "destructive" });
       return;
     }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(customerInfo.email)) {
-      toast({ title: "Invalid Email", description: "Please enter a valid email address", variant: "destructive" });
-      return;
-    }
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(customerInfo.phone)) {
-      toast({ title: "Invalid Phone", description: "Please enter a valid 10-digit phone number", variant: "destructive" });
-      return;
-    }
+    // Basic validation...
 
     setIsProcessing(true);
+    console.log("PAYMENT PLAN:", selectedPackage.planId);
 
     try {
-      // 1. Submit Lead (Capture details even if payment fails)
+      // 1. Submit Lead
       await fetch(`${import.meta.env.VITE_API_BASE_URL}/submit-lead`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -138,7 +139,7 @@ export function Packages() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          planId: selectedPackage.id,
+          planId: selectedPackage.planId, // Uses planId from Sanity
           couponCode: couponCode || undefined
         }),
       });
@@ -149,7 +150,6 @@ export function Packages() {
         throw new Error(orderData.message || 'Failed to create order');
       }
 
-      // 3. Open Razorpay Checkout
       const options = {
         key: orderData.key_id,
         amount: orderData.amount,
@@ -160,11 +160,10 @@ export function Packages() {
         handler: function (response: any) {
           toast({
             title: "Payment Successful!",
-            description: "We have received your payment. You will receive a confirmation email shortly.",
+            description: "We have received your payment.",
           });
           setIsFormDialogOpen(false);
           setCustomerInfo({ name: '', email: '', phone: '' });
-          // Ideally, verify signature here or trust webhook
         },
         prefill: {
           name: customerInfo.name,
@@ -172,7 +171,7 @@ export function Packages() {
           contact: customerInfo.phone,
         },
         theme: {
-          color: "#9b87f5", // Primary Purple
+          color: "#9b87f5",
         },
         modal: {
           ondismiss: function () {
@@ -184,16 +183,11 @@ export function Packages() {
       const rzp1 = new Razorpay(options);
       rzp1.open();
 
-      // Note: isProcessing stays true until modal dismissed or payment handled, 
-      // but Razorpay modal handles its own state. We can turn it off after open? 
-      // Better to keep it on processing until handler or dismiss.
-      // We rely on ondismiss above.
-
     } catch (error: any) {
       console.error('Payment Error:', error);
       toast({
         title: "Payment Failed",
-        description: error.message || "An error occurred during payment initialization.",
+        description: error.message || "An error occurred.",
         variant: "destructive",
       });
       setIsProcessing(false);
@@ -395,6 +389,43 @@ export function Packages() {
                   Processing...
                 </>
               ) : 'Proceed to Payment'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* QR Code Dialog */}
+      <Dialog open={isQRDialogOpen} onOpenChange={setIsQRDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Scan to Pay</DialogTitle>
+            <DialogDescription>
+              Scan the QR code below to pay for <strong>{selectedPackage?.name}</strong>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center p-6 space-y-4">
+            {selectedPackage?.qrImage ? (
+              <div className="relative w-64 h-64 border-4 border-white shadow-xl rounded-lg overflow-hidden">
+                <img
+                  src={urlFor(selectedPackage.qrImage).width(500).url()}
+                  alt="Payment QR Code"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <div className="text-muted-foreground">QR Code not available</div>
+            )}
+            <div className="text-center text-sm text-muted-foreground">
+              Amount to pay: <span className="font-bold text-foreground">₹{selectedPackage?.price.toLocaleString()}</span>
+            </div>
+          </div>
+          <DialogFooter className="sm:justify-center">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setIsQRDialogOpen(false)}
+            >
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -55,7 +55,7 @@ export function MentoriaPackages() {
             name: pkg.title,
             features: pkg.features || [],
             isActive: true,
-            // Ensure we have a subgroup even if missing in old data (fallback logic not needed if entered correctly)
+            planId: pkg.planId, // Explicit mapping
             subgroup: pkg.subgroup
           })));
         } else {

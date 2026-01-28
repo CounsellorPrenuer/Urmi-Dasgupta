@@ -55,11 +55,42 @@ export default defineType({
             type: 'string',
             options: {
                 list: [
-                    { title: 'Packages', value: 'packages' },
+                    { title: 'Claryntia Healing', value: 'healing' },
                     { title: 'Mentoria Packages', value: 'mentoria' },
                 ],
             },
             validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+            name: 'slug',
+            title: 'Slug',
+            type: 'slug',
+            options: {
+                source: 'title',
+                maxLength: 96,
+            },
+        }),
+        defineField({
+            name: 'paymentType',
+            title: 'Payment Type',
+            type: 'string',
+            options: {
+                list: [
+                    { title: 'Razorpay', value: 'razorpay' },
+                    { title: 'QR Code', value: 'qr' },
+                ],
+                layout: 'radio',
+            },
+            initialValue: 'razorpay',
+        }),
+        defineField({
+            name: 'qrImage',
+            title: 'QR Code Image',
+            type: 'image',
+            hidden: ({ document }) => document?.paymentType !== 'qr',
+            options: {
+                hotspot: true,
+            },
         }),
         defineField({
             name: 'subgroup',

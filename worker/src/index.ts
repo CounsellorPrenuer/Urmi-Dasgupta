@@ -24,16 +24,27 @@ app.use('/*', cors({
 
 // Pricing Configuration (Source of Truth)
 const PRICING_CONFIG: Record<string, number> = {
-    'pkg-1': 5500,  // Discover
-    'pkg-2': 15000, // Discovery Plus
-    'pkg-3': 5999,  // Achieve
-    'pkg-4': 10599, // Achieve Plus
-    'pkg-5': 25000, // Ascend
-    'pkg-6': 50000, // Ascend Plus
+    // New Healing Packages
+    'photo_energy_individual': 1999,
+    'photo_energy_couples': 3333,
+    'healing_session': 3333,
+    'heartbreak_program': 9999,
+    'tarot_reading': 2999,
+    'animal_communication': 2999,
+    'pet_healing': 3333,
+    // Mentoria Packages (Preserved)
     'mp-1': 4999,   // Foundation
     'mp-2': 9999,   // Advanced
     'mp-3': 14999,  // Pro
 }
+
+// Diagnostic Endpoint
+app.get('/_diag', (c) => {
+    return c.json({
+        status: 'ok',
+        pricing_keys: Object.keys(PRICING_CONFIG)
+    })
+})
 
 // Health Check
 app.get('/health', async (c) => {
