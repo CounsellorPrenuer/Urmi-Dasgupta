@@ -41,7 +41,12 @@ export default function AdminLogin() {
       const response = await apiRequest("POST", "/api/auth/login", data);
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
+      // Store Token for Persistence
+      if (data.token) {
+        localStorage.setItem('admin_token', data.token);
+      }
+
       toast({
         title: "Login successful",
         description: "Welcome to the admin dashboard",
@@ -71,12 +76,7 @@ export default function AdminLogin() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* --- Credentials Added Here --- */}
-          <div className="bg-muted p-3 rounded-md mb-4 text-sm text-muted-foreground">
-            <p><strong>Username:</strong> <code>admin</code></p>
-            <p className="mt-1"><strong>Password:</strong> <code>admin123</code></p>
-          </div>
-          {/* --------------------------- */}
+          {/* Credentials hidden as requested */}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField

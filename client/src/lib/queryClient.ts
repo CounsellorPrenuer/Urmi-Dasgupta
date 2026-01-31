@@ -18,11 +18,17 @@ export async function apiRequest(
     ? `${config.api.baseUrl}${url}`
     : url;
 
+  /* Refactored to Token Auth */
+  const token = localStorage.getItem('admin_token');
+  const headers: Record<string, string> = data ? { "Content-Type": "application/json" } : {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   const res = await fetch(fullUrl, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers,
     body: data ? JSON.stringify(data) : undefined,
-    // credentials: "include", // Worker on different domain might need cors config for cookies, but for now let's try without strict cookie check or rely on simple token response
   });
 
   await throwIfResNotOk(res);
@@ -40,8 +46,15 @@ export const getQueryFn: <T>(options: {
         ? `${config.api.baseUrl}${path}`
         : path;
 
+      /* Refactored to Token Auth */
+      const token = localStorage.getItem('admin_token');
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const res = await fetch(fullUrl, {
-        // credentials: "include",
+        headers
       });
 
       if (unauthorizedBehavior === "returnNull" && res.status === 401) {

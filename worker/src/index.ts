@@ -198,27 +198,27 @@ app.post('/razorpay-webhook', async (c) => {
 
 // --- Auth Endpoints ---
 const ADMIN_USERNAME = 'admin';
-const ADMIN_PASSWORD = 'admin123'; // Hardcoded for simplicity as requested
+const ADMIN_PASSWORD = 'admin123'; // Hardcoded for simplicity
+// In a real app, use a secret key for signing tokens.
+// For this simple case, we'll just use a recognizable "token" string that we validate.
+const MOCK_TOKEN = 'valid-admin-token-12345';
+
+// Middleware helper for protected routes (can be used manually inside handlers)
+const isAuthenticated = (c: any) => {
+    const authHeader = c.req.header('Authorization');
+    return authHeader === `Bearer ${MOCK_TOKEN}`;
+}
 
 app.post('/api/auth/login', async (c) => {
     try {
         const { username, password } = await c.req.json();
         if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-            // Simple success response. 
-            // In a real app, we'd set a secure HTTP-only cookie.
-            // For this static site + worker setup without custom domain cookies easily, 
-            // we will rely on key exchange or just successful login state on client.
-            // But AdminLogin.tsx expects a 200 OK.
-            // IMPORTANT: If client/src/lib/queryClient.ts doesn't handle cookies, 
-            // the session won't persist on refresh properly unless we use a token.
-            // But let's verify what AdminLogin expects.
-            // It just says "Login successful" and redirects.
-            // The `api/auth/session` check usually just checks if the cookie exists.
-
-            // Setting a cookie manually
-            // Note: Cloudflare Workers native cookie handling
-            c.header('Set-Cookie', `auth_session=valid; Path=/; HttpOnly; SameSite=None; Secure; Max-Age=86400`);
-            return c.json({ success: true, message: 'Login successful' });
+            // Token-based Auth (Simpler for cross-origin than cookies)
+            return c.json({
+                success: true,
+                message: 'Login successful',
+                token: MOCK_TOKEN
+            });
         }
         return c.json({ success: false, message: 'Invalid credentials' }, 401);
     } catch (e) {
@@ -227,13 +227,13 @@ app.post('/api/auth/login', async (c) => {
 });
 
 app.post('/api/auth/logout', async (c) => {
-    c.header('Set-Cookie', `auth_session=; Path=/; HttpOnly; SameSite=None; Secure; Max-Age=0`);
+    // Client should clear token
     return c.json({ success: true, message: 'Logged out' });
 });
 
 app.get('/api/auth/session', async (c) => {
-    const cookie = c.req.header('Cookie');
-    if (cookie && cookie.includes('auth_session=valid')) {
+    const authHeader = c.req.header('Authorization');
+    if (authHeader === `Bearer ${MOCK_TOKEN}`) {
         return c.json({ success: true, user: { username: ADMIN_USERNAME, id: 1 } });
     }
     return c.json({ success: false, message: 'Unauthorized' }, 401);
@@ -243,6 +243,7 @@ app.get('/api/auth/session', async (c) => {
 
 // Get all Leads (Contact Submissions)
 app.get('/api/contact', async (c) => {
+    if (!isAuthenticated(c)) return c.json({ error: 'Unauthorized' }, 401);
     try {
         const { results } = await c.env.DB.prepare(
             `SELECT * FROM leads ORDER BY created_at DESC`
@@ -265,6 +266,7 @@ app.get('/api/contact', async (c) => {
 
 // Get all Payments (Transactions)
 app.get('/api/payments', async (c) => {
+    if (!isAuthenticated(c)) return c.json({ error: 'Unauthorized' }, 401);
     try {
         const { results } = await c.env.DB.prepare(
             `SELECT * FROM transactions ORDER BY created_at DESC`
