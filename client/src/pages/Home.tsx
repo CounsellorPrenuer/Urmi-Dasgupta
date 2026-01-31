@@ -7,7 +7,7 @@ import { ChangingLandscape } from '@/components/sections/ChangingLandscape';
 import { Methodology } from '@/components/sections/Methodology';
 import { Services } from '@/components/sections/Services';
 import { Founder } from '@/components/sections/Founder';
-import { Packages } from '@/components/sections/Packages';
+import { HealingPackages } from '@/components/sections/HealingPackages';
 import { MentoriaPackages } from '@/components/sections/MentoriaPackages';
 import { Blog } from '@/components/sections/Blog';
 import { HealingTestimonials } from '@/components/sections/HealingTestimonials';
@@ -28,7 +28,7 @@ export default function Home() {
       <Methodology />
       <Services />
       <Founder />
-      <Packages />
+      <HealingPackages />
       <MentoriaPackages />
       <HealingTestimonials />
       <CareerTestimonials />

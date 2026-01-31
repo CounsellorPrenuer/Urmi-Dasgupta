@@ -22,27 +22,88 @@ app.use('/*', cors({
     maxAge: 600,
 }))
 
-// Pricing Configuration (Source of Truth)
-const PRICING_CONFIG: Record<string, number> = {
-    // New Healing Packages
-    'photo_energy_individual': 1999,
-    'photo_energy_couples': 3333,
-    'healing_session': 3333,
-    'heartbreak_program': 9999,
-    'tarot_reading': 2999,
-    'animal_communication': 2999,
-    'pet_healing': 3333,
-    // Mentoria Packages (Preserved)
-    'mp-1': 4999,   // Foundation
-    'mp-2': 9999,   // Advanced
-    'mp-3': 14999,  // Pro
-}
+// Create UPI QR Code Endpoint
+app.post('/create-upi', async (c) => {
+    try {
+        const body = await c.req.json()
+        const { planId, couponCode } = orderSchema.parse(body)
+
+        // 1. Fetch Plan from Sanity
+        const query = `*[_type == "pricing" && planId == "${planId}"][0]{price, title}`
+        const sanityUrl = `https://${c.env.SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${c.env.SANITY_DATASET}?query=${encodeURIComponent(query)}`
+
+        const priceRes = await fetch(sanityUrl, {
+            headers: { 'Authorization': `Bearer ${c.env.SANITY_API_TOKEN}` }
+        })
+
+        if (!priceRes.ok) throw new Error("Failed to fetch price from Sanity")
+        const { result: plan } = await priceRes.json() as any
+
+        if (!plan) return c.json({ success: false, message: 'Invalid Plan ID' }, 400)
+
+        let finalAmount = plan.price
+
+        // 2. Apply Coupon (Reuse logic if possible, simplified here)
+        if (couponCode) {
+            const couponQuery = `*[_type == "coupon" && code == "${couponCode}" && isActive == true][0]`
+            const couponUrl = `https://${c.env.SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${c.env.SANITY_DATASET}?query=${encodeURIComponent(couponQuery)}`
+            const couponRes = await fetch(couponUrl, { headers: { 'Authorization': `Bearer ${c.env.SANITY_API_TOKEN}` } })
+            if (couponRes.ok) {
+                const { result } = await couponRes.json() as any
+                if (result) {
+                    if (result.discountType === 'percentage') {
+                        finalAmount = Math.floor(plan.price * (1 - result.discountAmount / 100))
+                    } else if (result.discountType === 'flat') {
+                        finalAmount = Math.max(0, plan.price - result.discountAmount)
+                    }
+                }
+            }
+        }
+
+        // 3. Generate UP QR via Razorpay
+        const razorpayAuth = btoa(`${c.env.RAZORPAY_KEY_ID}:${c.env.RAZORPAY_KEY_SECRET}`)
+        const response = await fetch('https://api.razorpay.com/v1/qr_codes', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Basic ${razorpayAuth}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type: "upi_qr",
+                name: "Claryntia",
+                usage: "single_use",
+                fixed_amount: true,
+                payment_amount: finalAmount * 100, // paise
+                description: `Payment for ${plan.title}`,
+                notes: { planId, couponCode }
+            })
+        })
+
+        if (!response.ok) {
+            const error = await response.json()
+            console.error('Razorpay QR Error:', error)
+            return c.json({ success: false, message: 'Failed to generate QR' }, 500)
+        }
+
+        const qrData: any = await response.json()
+
+        return c.json({
+            success: true,
+            qr_url: qrData.image_url,
+            amount: finalAmount
+        })
+
+    } catch (error) {
+        console.error('Create UPI Error:', error)
+        return c.json({ success: false, message: 'Internal Server Error' }, 500)
+    }
+})
 
 // Diagnostic Endpoint
 app.get('/_diag', (c) => {
     return c.json({
         status: 'ok',
-        pricing_keys: Object.keys(PRICING_CONFIG)
+        mode: 'dynamic-sanity-pricing'
     })
 })
 
@@ -97,37 +158,47 @@ app.post('/create-order', async (c) => {
         const body = await c.req.json()
         const { planId, couponCode } = orderSchema.parse(body)
 
-        // Validate Plan
-        const basePrice = PRICING_CONFIG[planId]
-        if (!basePrice) {
+        // 1. Fetch Plan Details from Sanity (Source of Truth)
+        const query = `*[_type == "pricing" && planId == "${planId}"][0]{price, title}`
+        const sanityUrl = `https://${c.env.SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${c.env.SANITY_DATASET}?query=${encodeURIComponent(query)}`
+
+        const priceRes = await fetch(sanityUrl, {
+            headers: { 'Authorization': `Bearer ${c.env.SANITY_API_TOKEN}` }
+        })
+
+        if (!priceRes.ok) {
+            throw new Error("Failed to fetch price from Sanity")
+        }
+
+        const { result: plan } = await priceRes.json() as any
+
+        if (!plan) {
             return c.json({ success: false, message: 'Invalid Plan ID' }, 400)
         }
 
-        let finalAmount = basePrice
+        let finalAmount = plan.price // Base price from Sanity
 
-        // Coupon Validation
+        // 2. Coupon Validation
         if (couponCode) {
-            const query = `*[_type == "coupon" && code == "${couponCode}" && isActive == true][0]`
-            const sanityUrl = `https://${c.env.SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${c.env.SANITY_DATASET}?query=${encodeURIComponent(query)}`
+            const couponQuery = `*[_type == "coupon" && code == "${couponCode}" && isActive == true][0]`
+            const couponUrl = `https://${c.env.SANITY_PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${c.env.SANITY_DATASET}?query=${encodeURIComponent(couponQuery)}`
 
-            const sanityRes = await fetch(sanityUrl, {
+            const couponRes = await fetch(couponUrl, {
                 headers: { 'Authorization': `Bearer ${c.env.SANITY_API_TOKEN}` }
             })
 
-            if (sanityRes.ok) {
-                const { result } = await sanityRes.json() as any
+            if (couponRes.ok) {
+                const { result } = await couponRes.json() as any
                 if (result) {
-                    // Check active (already in query) and expiry
                     const now = new Date()
                     if (result.expiryDate && new Date(result.expiryDate) < now) {
                         return c.json({ success: false, message: 'Coupon expired' }, 400)
                     }
 
-                    // Apply discount
                     if (result.discountType === 'percentage') {
-                        finalAmount = Math.floor(basePrice * (1 - result.discountAmount / 100))
+                        finalAmount = Math.floor(plan.price * (1 - result.discountAmount / 100))
                     } else if (result.discountType === 'flat') {
-                        finalAmount = Math.max(0, basePrice - result.discountAmount)
+                        finalAmount = Math.max(0, plan.price - result.discountAmount)
                     }
                 } else {
                     return c.json({ success: false, message: 'Invalid coupon' }, 400)
@@ -135,7 +206,7 @@ app.post('/create-order', async (c) => {
             }
         }
 
-        // Create Order via Razorpay API
+        // 3. Create Order via Razorpay API
         const razorpayAuth = btoa(`${c.env.RAZORPAY_KEY_ID}:${c.env.RAZORPAY_KEY_SECRET}`)
         const response = await fetch('https://api.razorpay.com/v1/orders', {
             method: 'POST',
@@ -146,7 +217,7 @@ app.post('/create-order', async (c) => {
             body: JSON.stringify({
                 amount: finalAmount * 100, // Amount in paise
                 currency: 'INR',
-                notes: { planId, couponCode }
+                notes: { planId, couponCode, planName: plan.title }
             })
         })
 
@@ -158,7 +229,7 @@ app.post('/create-order', async (c) => {
 
         const order: any = await response.json()
 
-        // Store transaction in D1
+        // 4. Store transaction in D1
         await c.env.DB.prepare(
             `INSERT INTO transactions (order_id, amount, currency, status, plan_id, coupon_code, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
         ).bind(

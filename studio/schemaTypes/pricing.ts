@@ -55,7 +55,7 @@ export default defineType({
             type: 'string',
             options: {
                 list: [
-                    { title: 'Claryntia Healing', value: 'healing' },
+                    { title: 'Healing Packages', value: 'healing' },
                     { title: 'Mentoria Packages', value: 'mentoria' },
                 ],
             },

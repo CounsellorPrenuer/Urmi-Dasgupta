@@ -2,26 +2,38 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Tag } from 'lucide-react';
 import type { MentoriaPackage } from '@shared/schema';
+import { config } from '@/lib/config';
 
 const paymentFormSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
   phone: z.string().min(10, 'Please enter a valid 10-digit mobile number'),
+  coupon: z.string().optional(),
 });
 
 type PaymentFormValues = z.infer<typeof paymentFormSchema>;
 
+// Local interface matching Sanity data structure
+interface PaymentPackage {
+  id?: string;
+  planId: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+}
+
 interface MentoriaPaymentModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  package: MentoriaPackage;
+  package: PaymentPackage;
 }
 
 declare global {
@@ -40,56 +52,33 @@ export function MentoriaPaymentModal({ open, onOpenChange, package: pkg }: Mento
       name: '',
       email: '',
       phone: '',
+      coupon: '',
     },
   });
-
-  const loadRazorpay = () => {
-    return new Promise((resolve) => {
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
-  };
 
   const onSubmit = async (data: PaymentFormValues) => {
     setIsProcessing(true);
 
-    // Simulate basic delay
-    setTimeout(() => {
-      toast({
-        title: 'Payment Successful!',
-        description: 'Thank you for your purchase. We will contact you shortly.',
-      });
-      form.reset();
-      onOpenChange(false);
-      setIsProcessing(false);
-    }, 1500);
-
-    /*
     try {
-      const res = await loadRazorpay();
-      if (!res) {
-        toast({
-          title: 'Error',
-          description: 'Failed to load payment gateway. Please try again.',
-          variant: 'destructive',
-        });
-        setIsProcessing(false);
-        return;
-      }
-
-      const orderResponse = await fetch('/api/mentoria-payment/create-order', {
+      // 1. Submit Lead
+      await fetch(`${config.api.baseUrl}/submit-lead`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          packageId: pkg.id,
-          customerName: data.name,
-          customerEmail: data.email,
-          customerPhone: data.phone,
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          message: `Initiated payment for ${pkg.name} (Mentoria)`
+        }),
+      });
+
+      // 2. Create Order
+      const orderResponse = await fetch(`${config.api.baseUrl}/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planId: pkg.planId, // Ensure planId is passed correctly
+          couponCode: data.coupon || undefined
         }),
       });
 
@@ -100,12 +89,13 @@ export function MentoriaPaymentModal({ open, onOpenChange, package: pkg }: Mento
       }
 
       const options = {
-        key: orderData.keyId,
-        amount: orderData.amount * 100,
+        key: orderData.key_id,
+        amount: orderData.amount, // already in paise from backend? Wait, backend sends amount in paise? 
+        // Backend: amount: finalAmount * 100. So YES.
         currency: orderData.currency,
         name: 'Claryntia',
-        description: `${pkg.name} - ${pkg.category}`,
-        order_id: orderData.orderId,
+        description: `${pkg.name}`,
+        order_id: orderData.order_id,
         prefill: {
           name: data.name,
           email: data.email,
@@ -114,45 +104,14 @@ export function MentoriaPaymentModal({ open, onOpenChange, package: pkg }: Mento
         theme: {
           color: '#6A1B9A',
         },
-        handler: async function (response: any) {
-          try {
-            const verifyResponse = await fetch('/api/mentoria-payment/verify', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-              }),
-            });
-
-            const verifyData = await verifyResponse.json();
-
-            if (verifyData.success) {
-              toast({
-                title: 'Payment Successful!',
-                description: 'Thank you for your purchase. We will contact you shortly.',
-              });
-              form.reset();
-              onOpenChange(false);
-            } else {
-              toast({
-                title: 'Payment Verification Failed',
-                description: 'Please contact support with your payment details.',
-                variant: 'destructive',
-              });
-            }
-          } catch (error) {
-            toast({
-              title: 'Error',
-              description: 'Payment verification failed. Please contact support.',
-              variant: 'destructive',
-            });
-          } finally {
-            setIsProcessing(false);
-          }
+        handler: function (response: any) {
+          toast({
+            title: 'Payment Successful!',
+            description: 'We have received your payment.',
+          });
+          form.reset();
+          onOpenChange(false);
+          setIsProcessing(false);
         },
         modal: {
           ondismiss: function () {
@@ -167,17 +126,16 @@ export function MentoriaPaymentModal({ open, onOpenChange, package: pkg }: Mento
 
       const paymentObject = new window.Razorpay(options);
       paymentObject.open();
-      onOpenChange(false);
-    } catch (error) {
+
+    } catch (error: any) {
       console.error('Payment error:', error);
       toast({
         title: 'Error',
-        description: 'Something went wrong. Please try again.',
+        description: error.message || 'Something went wrong. Please try again.',
         variant: 'destructive',
       });
       setIsProcessing(false);
     }
-    */
   };
 
   return (
@@ -203,11 +161,7 @@ export function MentoriaPaymentModal({ open, onOpenChange, package: pkg }: Mento
                 <FormItem>
                   <FormLabel>Full Name *</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Enter your full name"
-                      {...field}
-                      data-testid="input-payment-name"
-                    />
+                    <Input placeholder="Enter your full name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -221,12 +175,7 @@ export function MentoriaPaymentModal({ open, onOpenChange, package: pkg }: Mento
                 <FormItem>
                   <FormLabel>Email *</FormLabel>
                   <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="your.email@example.com"
-                      {...field}
-                      data-testid="input-payment-email"
-                    />
+                    <Input type="email" placeholder="your.email@example.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -240,13 +189,29 @@ export function MentoriaPaymentModal({ open, onOpenChange, package: pkg }: Mento
                 <FormItem>
                   <FormLabel>Contact Number *</FormLabel>
                   <FormControl>
-                    <Input
-                      type="tel"
-                      placeholder="+91 98765 43210"
-                      {...field}
-                      data-testid="input-payment-phone"
-                    />
+                    <Input type="tel" placeholder="+91 98765 43210" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="coupon"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Coupon Code (Optional)</FormLabel>
+                  <div className="flex gap-2">
+                    <FormControl>
+                      <Input
+                        placeholder="Enter coupon code"
+                        {...field}
+                        onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                      />
+                    </FormControl>
+                    <Tag className="w-5 h-5 text-muted-foreground self-center" />
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -257,7 +222,6 @@ export function MentoriaPaymentModal({ open, onOpenChange, package: pkg }: Mento
               size="lg"
               className="w-full bg-gradient-to-r from-primary-purple to-secondary-blue text-white rounded-full"
               disabled={isProcessing}
-              data-testid="button-pay-now"
             >
               {isProcessing ? (
                 <>
