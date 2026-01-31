@@ -70,7 +70,7 @@ export default function AdminLogin() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Admin Login</CardTitle>
+          <CardTitle>Admin Login (v2)</CardTitle>
           <CardDescription>
             Sign in to access the admin dashboard
           </CardDescription>
