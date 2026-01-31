@@ -16,9 +16,9 @@ const app = new Hono<{ Bindings: Bindings }>()
 
 // CORS Configuration
 app.use('/*', cors({
-    origin: ['https://claryntia.com', 'https://www.claryntia.com', 'http://localhost:5173'],
-    allowMethods: ['POST', 'GET', 'OPTIONS'],
-    allowHeaders: ['Content-Type', 'X-Razorpay-Signature'],
+    origin: '*', // Debugging: Allow all temporarily to rule out origin mismatch
+    allowMethods: ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE'],
+    allowHeaders: ['Content-Type', 'Authorization', 'X-Razorpay-Signature'],
     maxAge: 600,
 }))
 
