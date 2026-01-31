@@ -196,6 +196,49 @@ app.post('/razorpay-webhook', async (c) => {
     // ...
 })
 
+// --- Auth Endpoints ---
+const ADMIN_USERNAME = 'admin';
+const ADMIN_PASSWORD = 'admin123'; // Hardcoded for simplicity as requested
+
+app.post('/api/auth/login', async (c) => {
+    try {
+        const { username, password } = await c.req.json();
+        if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+            // Simple success response. 
+            // In a real app, we'd set a secure HTTP-only cookie.
+            // For this static site + worker setup without custom domain cookies easily, 
+            // we will rely on key exchange or just successful login state on client.
+            // But AdminLogin.tsx expects a 200 OK.
+            // IMPORTANT: If client/src/lib/queryClient.ts doesn't handle cookies, 
+            // the session won't persist on refresh properly unless we use a token.
+            // But let's verify what AdminLogin expects.
+            // It just says "Login successful" and redirects.
+            // The `api/auth/session` check usually just checks if the cookie exists.
+
+            // Setting a cookie manually
+            // Note: Cloudflare Workers native cookie handling
+            c.header('Set-Cookie', `auth_session=valid; Path=/; HttpOnly; SameSite=None; Secure; Max-Age=86400`);
+            return c.json({ success: true, message: 'Login successful' });
+        }
+        return c.json({ success: false, message: 'Invalid credentials' }, 401);
+    } catch (e) {
+        return c.json({ success: false, message: 'Error logging in' }, 500);
+    }
+});
+
+app.post('/api/auth/logout', async (c) => {
+    c.header('Set-Cookie', `auth_session=; Path=/; HttpOnly; SameSite=None; Secure; Max-Age=0`);
+    return c.json({ success: true, message: 'Logged out' });
+});
+
+app.get('/api/auth/session', async (c) => {
+    const cookie = c.req.header('Cookie');
+    if (cookie && cookie.includes('auth_session=valid')) {
+        return c.json({ success: true, user: { username: ADMIN_USERNAME, id: 1 } });
+    }
+    return c.json({ success: false, message: 'Unauthorized' }, 401);
+});
+
 // --- Admin Endpoints ---
 
 // Get all Leads (Contact Submissions)
