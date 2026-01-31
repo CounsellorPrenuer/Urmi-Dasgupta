@@ -29,5 +29,18 @@ export default defineType({
             initialValue: 5,
             validation: (Rule) => Rule.min(1).max(5),
         }),
+        defineField({
+            name: 'category',
+            title: 'Category',
+            type: 'string',
+            options: {
+                list: [
+                    { title: 'Healing Packages', value: 'healing' },
+                    { title: 'Career Counselling', value: 'career' },
+                ],
+            },
+            initialValue: 'healing', // Default for backward compatibility
+            validation: (Rule) => Rule.required(),
+        }),
     ],
 })

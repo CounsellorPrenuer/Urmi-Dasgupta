@@ -10,7 +10,8 @@ import { Founder } from '@/components/sections/Founder';
 import { Packages } from '@/components/sections/Packages';
 import { MentoriaPackages } from '@/components/sections/MentoriaPackages';
 import { Blog } from '@/components/sections/Blog';
-import { Testimonials } from '@/components/sections/Testimonials';
+import { HealingTestimonials } from '@/components/sections/HealingTestimonials';
+import { CareerTestimonials } from '@/components/sections/CareerTestimonials';
 import { Mentoria } from '@/components/sections/Mentoria';
 import { Contact } from '@/components/sections/Contact';
 import { Footer } from '@/components/sections/Footer';
@@ -29,7 +30,8 @@ export default function Home() {
       <Founder />
       <Packages />
       <MentoriaPackages />
-      <Testimonials />
+      <HealingTestimonials />
+      <CareerTestimonials />
       <Blog />
       <Mentoria />
       <Contact />
