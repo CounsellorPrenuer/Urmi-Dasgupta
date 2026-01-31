@@ -89,11 +89,11 @@ export function Contact() {
       } else {
         throw new Error(result.message || 'Submission failed');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Contact submission error:', error);
       toast({
         title: 'Error',
-        description: 'Something went wrong. Please try again.',
+        description: error.message || 'Something went wrong. Please try again.',
         variant: 'destructive',
       });
     } finally {
