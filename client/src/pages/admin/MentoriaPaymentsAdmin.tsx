@@ -23,12 +23,19 @@ import type { PaymentTracking } from "@shared/schema";
 import { format } from "date-fns";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
+import { config } from "@/lib/config";
+
 export default function MentoriaPaymentsAdmin() {
   const { toast } = useToast();
-  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
-  const { data: payments, isLoading } = useQuery<PaymentTracking[]>({
-    queryKey: ["/api/payments"],
+  const { data: payments, isLoading } = useQuery<any[]>({
+    queryKey: ["/api/payments"], // Reuse same endpoint? or specific one?
+    queryFn: async () => {
+      const res = await fetch(`${config.api.baseUrl}/api/payments`);
+      if (!res.ok) throw new Error("Failed to fetch payments");
+      return res.json();
+    },
   });
 
   const mentoriaPayments = payments?.filter(p => p.razorpayOrderId) || [];
@@ -37,7 +44,7 @@ export default function MentoriaPaymentsAdmin() {
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
       const payment = payments?.find(p => p.id === id);
       if (!payment) throw new Error("Payment not found");
-      
+
       const response = await apiRequest("PUT", `/api/payments/${id}`, {
         ...payment,
         status,

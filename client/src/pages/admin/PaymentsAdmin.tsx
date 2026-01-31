@@ -24,19 +24,26 @@ import type { PaymentTracking } from "@shared/schema";
 import { format } from "date-fns";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
+import { config } from "@/lib/config";
+
 export default function PaymentsAdmin() {
   const { toast } = useToast();
-  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
-  const { data: payments, isLoading } = useQuery<PaymentTracking[]>({
+  const { data: payments, isLoading } = useQuery<any[]>({
     queryKey: ["/api/payments"],
+    queryFn: async () => {
+      const res = await fetch(`${config.api.baseUrl}/api/payments`);
+      if (!res.ok) throw new Error("Failed to fetch payments");
+      return res.json();
+    },
   });
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
       const payment = payments?.find(p => p.id === id);
       if (!payment) throw new Error("Payment not found");
-      
+
       const response = await apiRequest("PUT", `/api/payments/${id}`, {
         ...payment,
         status,

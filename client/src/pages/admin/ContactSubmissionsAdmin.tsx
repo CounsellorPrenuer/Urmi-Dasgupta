@@ -17,11 +17,20 @@ import type { ContactSubmission } from "@shared/schema";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { format } from "date-fns";
 
+import { config } from "@/lib/config";
+
+// ... (imports)
+
 export default function ContactSubmissionsAdmin() {
   const [selectedSubmission, setSelectedSubmission] = useState<ContactSubmission | null>(null);
-  
+
   const { data: submissions, isLoading } = useQuery<ContactSubmission[]>({
     queryKey: ["/api/contact"],
+    queryFn: async () => {
+      const res = await fetch(`${config.api.baseUrl}/api/contact`);
+      if (!res.ok) throw new Error("Failed to fetch submissions");
+      return res.json();
+    },
   });
 
   if (isLoading) {
@@ -90,7 +99,7 @@ export default function ContactSubmissionsAdmin() {
           <DialogHeader>
             <DialogTitle>Submission Details</DialogTitle>
           </DialogHeader>
-          
+
           {selectedSubmission && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -98,24 +107,24 @@ export default function ContactSubmissionsAdmin() {
                   <label className="text-sm font-semibold text-muted-foreground">Name</label>
                   <p className="text-base break-words" data-testid="detail-name">{selectedSubmission.name}</p>
                 </div>
-                
+
                 <div>
                   <label className="text-sm font-semibold text-muted-foreground">Email</label>
                   <p className="text-base break-all" data-testid="detail-email">{selectedSubmission.email}</p>
                 </div>
-                
+
                 <div>
                   <label className="text-sm font-semibold text-muted-foreground">Phone</label>
                   <p className="text-base break-words" data-testid="detail-phone">{selectedSubmission.phone}</p>
                 </div>
-                
+
                 <div>
                   <label className="text-sm font-semibold text-muted-foreground">Purpose</label>
                   <div className="mt-1">
                     <Badge variant="outline" data-testid="detail-purpose">{selectedSubmission.purpose}</Badge>
                   </div>
                 </div>
-                
+
                 <div className="md:col-span-2">
                   <label className="text-sm font-semibold text-muted-foreground">Date</label>
                   <p className="text-base" data-testid="detail-date">
@@ -123,14 +132,14 @@ export default function ContactSubmissionsAdmin() {
                   </p>
                 </div>
               </div>
-              
+
               <div>
                 <label className="text-sm font-semibold text-muted-foreground">Message</label>
                 <p className="text-base mt-1 p-3 bg-muted rounded-md break-words whitespace-pre-wrap" data-testid="detail-message">
                   {selectedSubmission.message}
                 </p>
               </div>
-              
+
               {selectedSubmission.briefMessage && (
                 <div>
                   <label className="text-sm font-semibold text-muted-foreground">Brief Message / Description</label>
