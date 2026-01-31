@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { config } from '@/lib/config';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useForm } from 'react-hook-form';
@@ -69,7 +70,7 @@ export function Contact() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/submit-lead`, {
+      const response = await fetch(`${config.api.baseUrl}/submit-lead`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

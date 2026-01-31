@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { config } from '@/lib/config';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -79,7 +80,7 @@ export function FreeDiscoveryCallModal({ open, onOpenChange }: FreeDiscoveryCall
       // Format the message to include all details since the backend schema is strict
       const formattedMessage = `Purpose: Free Discovery Call\nBackground: ${data.background}\n\nMessage:\n${data.briefMessage || 'N/A'}`;
 
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/submit-lead`, {
+      const response = await fetch(`${config.api.baseUrl}/submit-lead`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

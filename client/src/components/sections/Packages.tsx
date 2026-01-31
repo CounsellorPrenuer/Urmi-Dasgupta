@@ -12,6 +12,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import type { Package } from '@shared/schema';
 import { sanityClient } from '@/lib/sanity';
 import imageUrlBuilder from '@sanity/image-url';
+import { config } from '@/lib/config';
 
 const builder = imageUrlBuilder(sanityClient);
 function urlFor(source: any) {
@@ -123,7 +124,7 @@ export function Packages() {
 
     try {
       // 1. Submit Lead
-      await fetch(`${import.meta.env.VITE_API_BASE_URL}/submit-lead`, {
+      await fetch(`${config.api.baseUrl}/submit-lead`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -135,7 +136,7 @@ export function Packages() {
       });
 
       // 2. Create Order
-      const orderResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/create-order`, {
+      const orderResponse = await fetch(`${config.api.baseUrl}/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
