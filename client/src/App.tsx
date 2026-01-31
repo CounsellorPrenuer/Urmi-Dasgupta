@@ -47,6 +47,10 @@ function AppRoutes() {
   );
 }
 
+import { config } from '@/lib/config';
+
+console.log('🚀 App Initialized. Using API Base URL:', config.api.baseUrl);
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
