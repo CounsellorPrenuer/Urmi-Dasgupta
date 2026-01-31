@@ -74,9 +74,12 @@ export function FreeDiscoveryCallModal({ open, onOpenChange }: FreeDiscoveryCall
 
   const onSubmit = async (data: DiscoveryCallFormValues) => {
     setIsSubmitting(true);
-    
+
     try {
-      const response = await fetch('/api/contact', {
+      // Format the message to include all details since the backend schema is strict
+      const formattedMessage = `Purpose: Free Discovery Call\nBackground: ${data.background}\n\nMessage:\n${data.briefMessage || 'N/A'}`;
+
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/submit-lead`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -85,26 +88,25 @@ export function FreeDiscoveryCallModal({ open, onOpenChange }: FreeDiscoveryCall
           name: data.name,
           email: data.email,
           phone: data.phone,
-          purpose: 'Free Discovery Call',
-          message: `Background: ${data.background}`,
-          briefMessage: data.briefMessage || null,
+          message: formattedMessage,
         }),
       });
 
       const result = await response.json();
-      
+
       if (response.ok && result.success) {
         toast({
           title: 'Discovery Call Request Submitted!',
           description: 'We\'ll contact you within 24 hours to schedule your free call.',
         });
-        
+
         form.reset();
         onOpenChange(false);
       } else {
         throw new Error(result.message || 'Submission failed');
       }
     } catch (error) {
+      console.error('Discovery call submission error:', error);
       toast({
         title: 'Error',
         description: 'Something went wrong. Please try again.',
@@ -187,131 +189,131 @@ export function FreeDiscoveryCallModal({ open, onOpenChange }: FreeDiscoveryCall
           <div>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name *</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter your full name"
-                        {...field}
-                        data-testid="input-discovery-name"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email Address *</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="your@email.com"
-                        {...field}
-                        data-testid="input-discovery-email"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number *</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="tel"
-                        placeholder="+91 98765 43210"
-                        {...field}
-                        data-testid="input-discovery-phone"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="background"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Are you a: *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger data-testid="select-discovery-background">
-                          <SelectValue placeholder="Select your current background" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {backgroundOptions.map((option) => (
-                          <SelectItem key={option} value={option}>
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="briefMessage"
-                render={({ field }) => {
-                  const wordCount = field.value ? field.value.trim().split(/\s+/).filter(word => word.length > 0).length : 0;
-                  return (
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tell me why you would like to connect* (Max 500 words)</FormLabel>
+                      <FormLabel>Full Name *</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder="Share a brief summary of your situation..."
-                          className="min-h-[100px] resize-y"
+                        <Input
+                          placeholder="Enter your full name"
                           {...field}
-                          data-testid="textarea-brief-message"
+                          data-testid="input-discovery-name"
                         />
                       </FormControl>
-                      <div className="text-xs text-muted-foreground text-right">
-                        {wordCount}/500 words
-                      </div>
                       <FormMessage />
                     </FormItem>
-                  );
-                }}
-              />
+                  )}
+                />
 
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full bg-primary-purple text-white rounded-full"
-                disabled={isSubmitting}
-                data-testid="button-submit-discovery-call"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    <Phone className="mr-2 h-4 w-4" />
-                    Book Now
-                  </>
-                )}
-              </Button>
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email Address *</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="your@email.com"
+                          {...field}
+                          data-testid="input-discovery-email"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number *</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="tel"
+                          placeholder="+91 98765 43210"
+                          {...field}
+                          data-testid="input-discovery-phone"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="background"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Are you a: *</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-discovery-background">
+                            <SelectValue placeholder="Select your current background" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {backgroundOptions.map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="briefMessage"
+                  render={({ field }) => {
+                    const wordCount = field.value ? field.value.trim().split(/\s+/).filter(word => word.length > 0).length : 0;
+                    return (
+                      <FormItem>
+                        <FormLabel>Tell me why you would like to connect* (Max 500 words)</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Share a brief summary of your situation..."
+                            className="min-h-[100px] resize-y"
+                            {...field}
+                            data-testid="textarea-brief-message"
+                          />
+                        </FormControl>
+                        <div className="text-xs text-muted-foreground text-right">
+                          {wordCount}/500 words
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
+                />
+
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="w-full bg-primary-purple text-white rounded-full"
+                  disabled={isSubmitting}
+                  data-testid="button-submit-discovery-call"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <Phone className="mr-2 h-4 w-4" />
+                      Book Now
+                    </>
+                  )}
+                </Button>
               </form>
             </Form>
           </div>
