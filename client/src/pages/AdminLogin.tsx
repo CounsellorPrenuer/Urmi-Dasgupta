@@ -76,7 +76,6 @@ export default function AdminLogin() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Credentials hidden as requested */}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
