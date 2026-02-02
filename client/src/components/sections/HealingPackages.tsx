@@ -38,10 +38,12 @@ export function HealingPackages() {
     const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
 
+    const [siteSettings, setSiteSettings] = useState<any>(null);
+
     useEffect(() => {
-        const fetchPricing = async () => {
+        const fetchData = async () => {
             try {
-                const query = `*[_type == "pricing" && category == "healing"] | order(order asc) {
+                const pricingQuery = `*[_type == "pricing" && category == "healing"] | order(order asc) {
           planId,
           title,
           description,
@@ -51,15 +53,25 @@ export function HealingPackages() {
           isPopular,
           "id": planId
         }`;
-                const result = await sanityClient.fetch(query);
-                setSanityPackages(result || []);
+                const settingsQuery = `*[_type == "siteSettings"][0]{
+                    upiQrCode,
+                    upiId
+                }`;
+
+                const [pricingResult, settingsResult] = await Promise.all([
+                    sanityClient.fetch(pricingQuery),
+                    sanityClient.fetch(settingsQuery)
+                ]);
+
+                setSanityPackages(pricingResult || []);
+                setSiteSettings(settingsResult);
             } catch (error) {
-                console.error('Error fetching pricing:', error);
+                console.error('Error fetching data:', error);
             } finally {
                 setIsLoading(false);
             }
         };
-        fetchPricing();
+        fetchData();
     }, []);
 
     const packages = sanityPackages.map(p => ({ ...p, name: p.title }));
@@ -91,7 +103,7 @@ export function HealingPackages() {
         setGeneratedQR(null); // Reset previously generated QR if any
     };
 
-    const submitLead = async () => {
+    const submitLead = async (paymentMethod: string) => {
         await fetch(`${config.api.baseUrl}/submit-lead`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -99,7 +111,7 @@ export function HealingPackages() {
                 name: customerInfo.name,
                 email: customerInfo.email,
                 phone: customerInfo.phone,
-                message: `Initiated payment for ${selectedPackage.name}`
+                message: `Initiated ${paymentMethod} payment for ${selectedPackage.name}`
             }),
         });
     }
@@ -109,7 +121,7 @@ export function HealingPackages() {
         setIsProcessing(true);
 
         try {
-            await submitLead();
+            await submitLead('razorpay');
 
             const orderResponse = await fetch(`${config.api.baseUrl}/create-order`, {
                 method: 'POST',
@@ -155,29 +167,27 @@ export function HealingPackages() {
 
     const handleUPIPayment = async () => {
         if (!validateForm()) return;
+
+        if (!siteSettings?.upiQrCode) {
+            toast({ title: "UPI Unavailable", description: "QR Code has not been configured yet.", variant: "destructive" });
+            return;
+        }
+
         setIsProcessing(true);
 
         try {
-            await submitLead();
+            await submitLead('UPI'); // Log the lead
 
-            const response = await fetch(`${config.api.baseUrl}/create-upi`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    planId: selectedPackage.planId,
-                    couponCode: couponCode || undefined
-                }),
-            });
+            // Calculate final price (simulated client-side for display, but static QR assumes user inputs amount)
+            // Wait, static QR usually means user scans and types amount.
+            // But we can instruct them.
 
-            const data = await response.json();
-            if (!data.success) throw new Error(data.message);
-
-            setGeneratedQR({ url: data.qr_url, amount: data.amount });
             setIsFormDialogOpen(false);
             setIsQRDialogOpen(true); // Open QR Modal
 
         } catch (error: any) {
-            toast({ title: "Could not generate QR", description: error.message, variant: "destructive" });
+            console.error(error);
+            toast({ title: "Error", description: "Could not open UPI options", variant: "destructive" });
         } finally {
             setIsProcessing(false);
         }
@@ -290,14 +300,25 @@ export function HealingPackages() {
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader><DialogTitle>Scan to Pay</DialogTitle></DialogHeader>
                     <div className="flex flex-col items-center justify-center p-6 space-y-4">
-                        {generatedQR ? (
+                        {siteSettings?.upiQrCode ? (
                             <>
                                 <div className="relative w-64 h-64 border-4 border-white shadow-xl rounded-lg overflow-hidden">
-                                    <img src={generatedQR.url} alt="UPI QR" className="w-full h-full object-cover" />
+                                    <img src={urlFor(siteSettings.upiQrCode).url()} alt="UPI QR" className="w-full h-full object-cover" />
                                 </div>
-                                <div className="text-center text-sm text-muted-foreground">Amount: <span className="font-bold text-foreground">₹{generatedQR.amount.toLocaleString()}</span></div>
+                                <div className="text-center space-y-2">
+                                    <p className="text-sm text-muted-foreground">Paying for: <span className="font-bold text-foreground">{selectedPackage?.name}</span></p>
+                                    <p className="text-sm">Scan with any UPI App</p>
+                                    {siteSettings.upiId && (
+                                        <div className="p-2 bg-muted rounded-md text-xs font-mono select-all cursor-pointer" onClick={() => {
+                                            navigator.clipboard.writeText(siteSettings.upiId);
+                                            toast({ title: "Copied!", description: "UPI ID copied to clipboard" });
+                                        }}>
+                                            UPI ID: {siteSettings.upiId}
+                                        </div>
+                                    )}
+                                </div>
                             </>
-                        ) : <Loader2 className="animate-spin" />}
+                        ) : <div className="text-red-500">QR Code not uploaded in Site Settings</div>}
                     </div>
                     <DialogFooter><Button onClick={() => setIsQRDialogOpen(false)}>Close</Button></DialogFooter>
                 </DialogContent>
