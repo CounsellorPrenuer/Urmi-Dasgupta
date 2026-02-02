@@ -305,15 +305,20 @@ export function HealingPackages() {
                                 <div className="relative w-64 h-64 border-4 border-white shadow-xl rounded-lg overflow-hidden">
                                     <img src={urlFor(siteSettings.upiQrCode).url()} alt="UPI QR" className="w-full h-full object-cover" />
                                 </div>
-                                <div className="text-center space-y-2">
+                                <div className="text-center space-y-2 w-full">
                                     <p className="text-sm text-muted-foreground">Paying for: <span className="font-bold text-foreground">{selectedPackage?.name}</span></p>
-                                    <p className="text-sm">Scan with any UPI App</p>
+                                    <p className="text-lg font-bold text-primary-purple">Amount to Pay: ₹{selectedPackage?.price?.toLocaleString()}</p>
+                                    <p className="text-xs text-muted-foreground">Scan with any UPI App (GPay, PhonePe, Paytm)</p>
                                     {siteSettings.upiId && (
-                                        <div className="p-2 bg-muted rounded-md text-xs font-mono select-all cursor-pointer" onClick={() => {
-                                            navigator.clipboard.writeText(siteSettings.upiId);
-                                            toast({ title: "Copied!", description: "UPI ID copied to clipboard" });
-                                        }}>
-                                            UPI ID: {siteSettings.upiId}
+                                        <div className="flex flex-col gap-1 mt-2">
+                                            <span className="text-xs text-muted-foreground">Or pay to UPI ID:</span>
+                                            <div className="p-2 bg-muted rounded-md text-sm font-mono select-all cursor-pointer flex justify-between items-center hover:bg-muted/80 transition-colors" onClick={() => {
+                                                navigator.clipboard.writeText(siteSettings.upiId);
+                                                toast({ title: "Copied!", description: "UPI ID copied to clipboard" });
+                                            }}>
+                                                <span>{siteSettings.upiId}</span>
+                                                <Tag className="w-3 h-3 ml-2" />
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -323,6 +328,6 @@ export function HealingPackages() {
                     <DialogFooter><Button onClick={() => setIsQRDialogOpen(false)}>Close</Button></DialogFooter>
                 </DialogContent>
             </Dialog>
-        </section>
+        </section >
     );
 }

@@ -124,7 +124,18 @@ export function MentoriaPaymentModal({ open, onOpenChange, package: pkg }: Mento
         },
       };
 
+      console.log('Opening Razorpay with options:', options);
       const paymentObject = new window.Razorpay(options);
+
+      paymentObject.on('payment.failed', function (response: any) {
+        console.error('Razorpay payment.failed:', response);
+        toast({
+          title: "Payment Failed",
+          description: response.error.description,
+          variant: "destructive"
+        });
+      });
+
       paymentObject.open();
 
     } catch (error: any) {
