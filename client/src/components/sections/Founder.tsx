@@ -82,12 +82,12 @@ export function Founder() {
             transition={{ duration: 0.8 }}
             className="order-1 lg:order-2 flex justify-center items-start"
           >
-            <div className="relative max-w-lg w-full">
+            <div className="relative max-w-xl w-full">
               <div className="absolute inset-0 bg-gradient-to-br from-primary-purple to-secondary-blue rounded-3xl blur-3xl opacity-20 animate-pulse" />
               <img
                 src={founderImg}
                 alt="Urmi Dasgupta - Founder"
-                className="relative rounded-3xl shadow-2xl w-full h-[34rem] object-cover object-top hover:scale-[1.02] transition-transform duration-500"
+                className="relative rounded-3xl shadow-2xl w-full h-[40rem] object-cover object-top hover:scale-[1.02] transition-transform duration-500"
                 data-testid="img-founder"
               />
             </div>
