@@ -6,9 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { User, ArrowRight, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
-import type { Blog as BlogType } from '@shared/schema';
+import { sanityClient } from '@/lib/sanity';
+import imageUrlBuilder from '@sanity/image-url';
 
 const gradients = [
   'from-primary-purple/20 to-secondary-blue/20',
@@ -17,15 +18,33 @@ const gradients = [
   'from-primary-purple/20 to-accent-orange/20',
 ];
 
-import { mockBlogs } from '@/lib/mockData';
+const builder = imageUrlBuilder(sanityClient);
+
+function urlFor(source: any) {
+  return builder.image(source);
+}
 
 export function Blog() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
-  const [selectedBlog, setSelectedBlog] = useState<BlogType | null>(null);
+  const [selectedBlog, setSelectedBlog] = useState<any | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const blogPosts = mockBlogs;
-  const isLoading = false;
+  const { data: blogPosts = [], isLoading } = useQuery({
+    queryKey: ['blog-posts'],
+    queryFn: async () => {
+      const posts = await sanityClient.fetch(`
+        *[_type == "post"] | order(publishedAt desc) {
+          _id,
+          title,
+          slug,
+          publishedAt,
+          body,
+          "imageUrl": body[_type == "image"][0].asset->url
+        }
+      `);
+      return posts;
+    },
+  });
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
@@ -102,7 +121,7 @@ export function Blog() {
               <div className="flex gap-6">
                 {blogPosts.map((post, index) => (
                   <div
-                    key={post.id}
+                    key={post._id}
                     className="flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-12px)] lg:flex-[0_0_calc(33.333%-16px)]"
                   >
                     <Card
@@ -121,18 +140,14 @@ export function Blog() {
                         </div>
                       )}
                       <CardHeader className="space-y-0 pb-3">
-                        {post.author && (
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground mb-3">
-                            <User className="w-3 h-3" />
-                            <span>{post.author}</span>
-                          </div>
-                        )}
                         <CardTitle className="font-serif text-xl text-primary-purple transition-colors">
                           {post.title}
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="flex-1 flex flex-col">
-                        <p className="text-sm text-muted-foreground mb-4 flex-1">{post.excerpt}</p>
+                        <p className="text-sm text-muted-foreground mb-4 flex-1">
+                          {post.body?.[0]?.children?.[0]?.text?.substring(0, 150) || 'Read more to discover...'}
+                        </p>
                         <div className="flex items-center gap-2 text-primary-purple font-medium text-sm group-hover:gap-3 transition-all" data-testid={`link-blog-read-more-${index}`}>
                           Read More
                           <ArrowRight className="w-4 h-4" />
@@ -180,15 +195,9 @@ export function Blog() {
                 <DialogTitle className="font-serif text-3xl mb-2">{selectedBlog.title}</DialogTitle>
                 <DialogDescription>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    {selectedBlog.author && (
-                      <div className="flex items-center gap-1">
-                        <User className="w-4 h-4" />
-                        <span>{selectedBlog.author}</span>
-                      </div>
-                    )}
                     <div className="flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
-                      <span>{formatDate(selectedBlog.createdAt)}</span>
+                      <span>{formatDate(selectedBlog.publishedAt || new Date())}</span>
                     </div>
                   </div>
                 </DialogDescription>
@@ -204,13 +213,26 @@ export function Blog() {
                   </div>
                 )}
                 <div className="prose prose-sm max-w-none">
-                  <p className="text-lg text-muted-foreground mb-6 font-medium">
-                    {selectedBlog.excerpt}
-                  </p>
-                  <div
-                    className="text-foreground whitespace-pre-wrap leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: selectedBlog.content }}
-                  />
+                  {selectedBlog.body?.map((block: any, index: number) => {
+                    if (block._type === 'block') {
+                      return (
+                        <p key={index} className="text-foreground mb-4">
+                          {block.children?.map((child: any) => child.text).join('')}
+                        </p>
+                      );
+                    }
+                    if (block._type === 'image' && block.asset) {
+                      return (
+                        <img
+                          key={index}
+                          src={urlFor(block).url()}
+                          alt={block.alt || ''}
+                          className="w-full rounded-lg my-4"
+                        />
+                      );
+                    }
+                    return null;
+                  })}
                 </div>
               </ScrollArea>
             </>
