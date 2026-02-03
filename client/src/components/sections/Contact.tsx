@@ -42,7 +42,7 @@ export function Contact() {
   });
 
   const contactInfo = [
-    { icon: Phone, label: 'Phone', value: '+91 9886635186', href: 'tel:+919886635186', iconColor: 'text-secondary-blue' },
+    { icon: Phone, label: 'Phone', value: '+91 8310291750', href: 'tel:+918310291750', iconColor: 'text-secondary-blue' },
     { icon: Mail, label: 'Email', value: 'claryntia@gmail.com', href: 'mailto:claryntia@gmail.com', iconColor: 'text-accent-orange' },
     { icon: MapPin, label: 'Location', value: 'Bangalore, India', href: null, iconColor: 'text-primary-purple' },
   ];
@@ -51,7 +51,7 @@ export function Contact() {
     { icon: Instagram, label: 'Instagram', href: 'https://www.instagram.com/urmidasgupta' },
     { icon: Linkedin, label: 'LinkedIn', href: 'https://www.linkedin.com/in/urmidasgupta/' },
     { icon: Twitter, label: 'X (Twitter)', href: 'https://x.com/@UrMzD' },
-    { icon: SiWhatsapp, label: 'WhatsApp', href: 'https://api.whatsapp.com/send/?phone=919886635186&text&type=phone_number&app_absent=0' },
+    { icon: SiWhatsapp, label: 'WhatsApp', href: 'https://api.whatsapp.com/send/?phone=918310291750&text&type=phone_number&app_absent=0' },
     { icon: SiYoutube, label: 'YouTube', href: 'https://www.youtube.com/@claryntia' },
     { icon: SiSpotify, label: 'Spotify', href: 'https://spotify.app.link/uEgPZ9ljLXb?_p=c11434dc9a0164eee01f8fe3eebd' },
     { icon: SiFacebook, label: 'Facebook', href: 'https://www.facebook.com/urmi.dasgupta' },

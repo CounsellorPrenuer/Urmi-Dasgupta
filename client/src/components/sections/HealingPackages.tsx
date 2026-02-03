@@ -286,11 +286,12 @@ export function HealingPackages() {
                             </div>
                         </div>
                     </div>
+                    <div className="flex-col sm:flex-row gap-2 hidden"></div>
                     <DialogFooter className="flex-col sm:flex-row gap-2">
                         <Button variant="outline" onClick={() => setIsFormDialogOpen(false)}>Cancel</Button>
-                        <Button onClick={handleUPIPayment} disabled={isProcessing} variant="secondary">Pay via UPI QR</Button>
-                        <Button onClick={handleRazorpayPayment} disabled={isProcessing} className="bg-primary-purple text-white">
-                            {isProcessing ? <Loader2 className="animate-spin" /> : 'Proceed to Payment'}
+                        <Button onClick={handleUPIPayment} disabled={isProcessing} className="bg-primary-purple text-white w-full sm:w-auto">
+                            {isProcessing ? <Loader2 className="animate-spin mr-2" /> : null}
+                            Pay via UPI QR
                         </Button>
                     </DialogFooter>
                 </DialogContent>
