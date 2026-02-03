@@ -7,7 +7,7 @@ import { FreeDiscoveryCallModal } from '@/components/FreeDiscoveryCallModal';
 
 const navLinks = [
   { name: 'Services', href: '#services' },
-  { name: 'Packages', href: '#packages' },
+  { name: 'Packages', href: '#healing-packages' },
   { name: 'About', href: '#founder' },
   { name: 'Blog', href: '#blog' },
   { name: 'Contact', href: '#contact' },
@@ -38,7 +38,7 @@ export function Navbar() {
     if (element) {
       // Close menu first for better UX
       setIsMobileMenuOpen(false);
-      
+
       // Small delay to let menu animation complete, then scroll
       setTimeout(() => {
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -51,11 +51,10 @@ export function Navbar() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isPastHero
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isPastHero
           ? 'bg-white/80 backdrop-blur-lg shadow-lg border-b border-gray-200'
           : 'bg-transparent'
-      }`}
+        }`}
       data-testid="nav-main"
     >
       <div className="max-w-7xl mx-auto px-6">
@@ -96,11 +95,10 @@ export function Navbar() {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
-                className={`font-medium transition-colors relative group cursor-pointer ${
-                  isPastHero 
-                    ? 'text-gray-900 hover:text-primary-purple' 
+                className={`font-medium transition-colors relative group cursor-pointer ${isPastHero
+                    ? 'text-gray-900 hover:text-primary-purple'
                     : 'text-white/90 hover:text-white'
-                }`}
+                  }`}
                 data-testid={`link-nav-${link.name.toLowerCase()}`}
               >
                 {link.name}
@@ -194,7 +192,7 @@ export function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-      
+
       <FreeDiscoveryCallModal open={isModalOpen} onOpenChange={setIsModalOpen} />
     </motion.nav>
   );
