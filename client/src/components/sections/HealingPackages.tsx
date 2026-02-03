@@ -105,16 +105,25 @@ export function HealingPackages() {
     };
 
     const submitLead = async (paymentMethod: string) => {
-        await fetch(`${config.api.baseUrl}/submit-lead`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                name: customerInfo.name,
-                email: customerInfo.email,
-                phone: customerInfo.phone,
-                message: `Initiated ${paymentMethod} payment for ${selectedPackage.name}`
-            }),
-        });
+        try {
+            const response = await fetch(`${config.api.baseUrl}/submit-lead`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: customerInfo.name,
+                    email: customerInfo.email,
+                    phone: customerInfo.phone,
+                    message: `Initiated ${paymentMethod} payment for ${selectedPackage.name}`
+                }),
+            });
+
+            if (!response.ok) {
+                console.error('Lead submission failed:', await response.text());
+            }
+        } catch (error) {
+            // Log but don't block the payment flow
+            console.error('Lead submission error:', error);
+        }
     }
 
     const handleRazorpayPayment = async () => {
