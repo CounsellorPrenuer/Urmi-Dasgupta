@@ -43,12 +43,12 @@ export function Founder() {
               <div className="mb-6">
                 <h3 className="font-serif text-3xl font-bold mb-4">Urmi Dasgupta</h3>
                 <p className="text-muted-foreground leading-relaxed mb-6">
-                  With 20+ years of corporate experience in Customer Success, Talent Management, and Leadership Transformation, 
+                  With 20+ years of corporate experience in Customer Success, Talent Management, and Leadership Transformation,
                   Urmi blends executive wisdom with intuitive healing.
                 </p>
                 <p className="text-muted-foreground leading-relaxed mb-6">
-                  She has guided over 3,800+ individuals in rediscovering their purpose and rebuilding meaningful relationships. 
-                  As a Certified Relationship Healer, Graphotherapist, and Career Coach, her mission is to bring clarity, 
+                  She has guided over 3,800+ individuals in rediscovering their purpose and rebuilding meaningful relationships.
+                  As a Certified Relationship Healer, Graphotherapist, and Career Coach, her mission is to bring clarity,
                   balance, and confidence to every client she meets.
                 </p>
                 <blockquote className="border-l-4 border-primary-purple pl-6 italic text-accent-orange text-lg mb-8">
@@ -82,12 +82,12 @@ export function Founder() {
             transition={{ duration: 0.8 }}
             className="order-1 lg:order-2 flex justify-center items-start"
           >
-            <div className="relative max-w-md w-full">
+            <div className="relative max-w-lg w-full">
               <div className="absolute inset-0 bg-gradient-to-br from-primary-purple to-secondary-blue rounded-3xl blur-3xl opacity-20 animate-pulse" />
               <img
                 src={founderImg}
                 alt="Urmi Dasgupta - Founder"
-                className="relative rounded-3xl shadow-2xl w-full h-[28rem] object-cover object-top"
+                className="relative rounded-3xl shadow-2xl w-full h-[34rem] object-cover object-top hover:scale-[1.02] transition-transform duration-500"
                 data-testid="img-founder"
               />
             </div>
