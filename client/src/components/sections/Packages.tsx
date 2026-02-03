@@ -37,10 +37,12 @@ export function Packages() {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
+  const [siteSettings, setSiteSettings] = useState<any>(null);
+
   useEffect(() => {
     const fetchPricing = async () => {
       try {
-        const query = `*[_type == "pricing" && category == "healing"] | order(order asc) {
+        const pricingQuery = `*[_type == "pricing" && category == "healing"] | order(order asc) {
           planId,
           title,
           description,
@@ -51,9 +53,18 @@ export function Packages() {
           qrImage,
           "id": planId
         }`;
-        const result = await sanityClient.fetch(query);
-        if (result && result.length > 0) {
-          setSanityPackages(result.map((pkg: any) => ({
+        const settingsQuery = `*[_type == "siteSettings"][0]{
+          upiQrCode,
+          upiId
+        }`;
+
+        const [pricingResult, settingsResult] = await Promise.all([
+          sanityClient.fetch(pricingQuery),
+          sanityClient.fetch(settingsQuery)
+        ]);
+
+        if (pricingResult && pricingResult.length > 0) {
+          setSanityPackages(pricingResult.map((pkg: any) => ({
             ...pkg,
             name: pkg.title,
             features: pkg.features || []
@@ -61,8 +72,9 @@ export function Packages() {
         } else {
           setSanityPackages([]);
         }
+        setSiteSettings(settingsResult);
       } catch (error) {
-        console.error('Error fetching pricing from Sanity:', error);
+        console.error('Error fetching data from Sanity:', error);
         setSanityPackages([]);
       } finally {
         setIsLoading(false);
@@ -405,16 +417,28 @@ export function Packages() {
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col items-center justify-center p-6 space-y-4">
-            {selectedPackage?.qrImage ? (
+            {selectedPackage?.qrImage || siteSettings?.upiQrCode ? (
               <div className="relative w-64 h-64 border-4 border-white shadow-xl rounded-lg overflow-hidden">
                 <img
-                  src={urlFor(selectedPackage.qrImage).width(500).url()}
+                  src={urlFor(selectedPackage?.qrImage || siteSettings?.upiQrCode).width(500).url()}
                   alt="Payment QR Code"
                   className="w-full h-full object-cover"
                 />
               </div>
             ) : (
-              <div className="text-muted-foreground">QR Code not available</div>
+              <div className="text-muted-foreground">QR Code not uploaded to Site Settings</div>
+            )}
+            {siteSettings?.upiId && (
+              <div className="flex flex-col gap-1 mt-2 text-center">
+                <span className="text-xs text-muted-foreground">Or pay to UPI ID:</span>
+                <div className="p-2 bg-muted rounded-md text-sm font-mono select-all cursor-pointer flex justify-center items-center hover:bg-muted/80 transition-colors mx-auto" onClick={() => {
+                  navigator.clipboard.writeText(siteSettings.upiId);
+                  toast({ title: "Copied!", description: "UPI ID copied to clipboard" });
+                }}>
+                  <span>{siteSettings.upiId}</span>
+                  <Copy className="w-3 h-3 ml-2" />
+                </div>
+              </div>
             )}
             <div className="text-center text-sm text-muted-foreground">
               Amount to pay: <span className="font-bold text-foreground">₹{selectedPackage?.price.toLocaleString()}</span>
