@@ -99,6 +99,7 @@ export function HealingPackages() {
     const handleGetStarted = (pkg: any) => {
         setSelectedPackage(pkg);
         setCouponCode('');
+        setDisplayPrice(pkg.price);
         setIsFormDialogOpen(true);
         setGeneratedQR(null); // Reset previously generated QR if any
     };
@@ -165,6 +166,8 @@ export function HealingPackages() {
         }
     };
 
+    const [displayPrice, setDisplayPrice] = useState(0);
+
     const handleUPIPayment = async () => {
         if (!validateForm()) return;
 
@@ -175,13 +178,45 @@ export function HealingPackages() {
 
         setIsProcessing(true);
 
+        let finalAmount = selectedPackage.price;
+
+        if (couponCode) {
+            try {
+                const couponQuery = `*[_type == "coupon" && code == "${couponCode}" && isActive == true][0]`;
+                const coupon = await sanityClient.fetch(couponQuery);
+
+                if (coupon) {
+                    const now = new Date();
+                    if (coupon.expiryDate && new Date(coupon.expiryDate) < now) {
+                        toast({ title: "Coupon Expired", description: "This coupon is no longer valid", variant: "destructive" });
+                        setIsProcessing(false);
+                        return;
+                    }
+
+                    if (coupon.discountType === 'percentage') {
+                        finalAmount = Math.floor(selectedPackage.price * (1 - coupon.discountAmount / 100));
+                    } else if (coupon.discountType === 'flat') {
+                        finalAmount = Math.max(0, selectedPackage.price - coupon.discountAmount);
+                    }
+                    toast({ title: "Coupon Applied!", description: `Discount applied. New total: ₹${finalAmount}` });
+                } else {
+                    toast({ title: "Invalid Coupon", description: "Please enter a valid coupon code", variant: "destructive" });
+                    setIsProcessing(false);
+                    return;
+                }
+            } catch (err) {
+                console.error("Coupon validation error:", err);
+                // Fallback to warning but allow proceed? No, safer to stop if they expect discount.
+                toast({ title: "Verification Failed", description: "Could not verify coupon. Please try again or clear it.", variant: "destructive" });
+                setIsProcessing(false);
+                return;
+            }
+        }
+
+        setDisplayPrice(finalAmount);
+
         try {
             await submitLead('UPI'); // Log the lead
-
-            // Calculate final price (simulated client-side for display, but static QR assumes user inputs amount)
-            // Wait, static QR usually means user scans and types amount.
-            // But we can instruct them.
-
             setIsFormDialogOpen(false);
             setIsQRDialogOpen(true); // Open QR Modal
 
@@ -308,7 +343,7 @@ export function HealingPackages() {
                                 </div>
                                 <div className="text-center space-y-2 w-full">
                                     <p className="text-sm text-muted-foreground">Paying for: <span className="font-bold text-foreground">{selectedPackage?.name}</span></p>
-                                    <p className="text-lg font-bold text-primary-purple">Amount to Pay: ₹{selectedPackage?.price?.toLocaleString()}</p>
+                                    <p className="text-lg font-bold text-primary-purple">Amount to Pay: ₹{displayPrice.toLocaleString()}</p>
                                     <p className="text-xs text-muted-foreground">Scan with any UPI App (GPay, PhonePe, Paytm)</p>
                                     {siteSettings.upiId && (
                                         <div className="flex flex-col gap-1 mt-2">
