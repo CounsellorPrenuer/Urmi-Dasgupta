@@ -1,0 +1,152 @@
+
+ ⛅️ wrangler 4.60.0 (update available 4.61.1)
+─────────────────────────────────────────────
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mBuild failed with 13 errors:[0m
+
+  [31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "buffer"[0m
+  
+      ../node_modules/safe-buffer/index.js:3:21:
+  [37m      3 │ var buffer = require([32m'buffer'[37m)
+          ╵                      [32m~~~~~~~~[0m
+  
+    The package "buffer" wasn't found on the file system but is built into node.
+    - Make sure to prefix the module name with "node:" or update your compatibility_date to 2024-09-23 or later.
+    
+  
+  
+  [31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "stream"[0m
+  
+      node_modules/@zone-eu/mailsplit/lib/chunked-passthrough.js:3:30:
+  [37m      3 │ const { Transform } = require([32m'stream'[37m);
+          ╵                               [32m~~~~~~~~[0m
+  
+    The package "stream" wasn't found on the file system but is built into node.
+    - Make sure to prefix the module name with "node:" or update your compatibility_date to 2024-09-23 or later.
+    
+  
+  
+  [31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "stream"[0m
+  
+      node_modules/@zone-eu/mailsplit/lib/flowed-decoder.js:5:26:
+  [37m      5 │ const Transform = require([32m'stream'[37m).Transform;
+          ╵                           [32m~~~~~~~~[0m
+  
+    The package "stream" wasn't found on the file system but is built into node.
+    - Make sure to prefix the module name with "node:" or update your compatibility_date to 2024-09-23 or later.
+    
+  
+  
+  [31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "stream"[0m
+  
+      node_modules/@zone-eu/mailsplit/lib/message-joiner.js:3:26:
+  [37m      3 │ const Transform = require([32m'stream'[37m).Transform;
+          ╵                           [32m~~~~~~~~[0m
+  
+    The package "stream" wasn't found on the file system but is built into node.
+    - Make sure to prefix the module name with "node:" or update your compatibility_date to 2024-09-23 or later.
+    
+  
+  
+  [31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "stream"[0m
+  
+      node_modules/@zone-eu/mailsplit/lib/message-splitter.js:3:26:
+  [37m      3 │ const Transform = require([32m'stream'[37m).Transform;
+          ╵                           [32m~~~~~~~~[0m
+  
+    The package "stream" wasn't found on the file system but is built into node.
+    - Make sure to prefix the module name with "node:" or update your compatibility_date to 2024-09-23 or later.
+    
+  
+  
+  [31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "stream"[0m
+  
+      node_modules/@zone-eu/mailsplit/lib/mime-node.js:7:28:
+  [37m      7 │ const PassThrough = require([32m'stream'[37m).PassThrough;
+          ╵                             [32m~~~~~~~~[0m
+  
+    The package "stream" wasn't found on the file system but is built into node.
+    - Make sure to prefix the module name with "node:" or update your compatibility_date to 2024-09-23 or later.
+    
+  
+  
+  [31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "path"[0m
+  
+      node_modules/@zone-eu/mailsplit/lib/mime-node.js:8:24:
+  [37m      8 │ const pathlib = require([32m'path'[37m);
+          ╵                         [32m~~~~~~[0m
+  
+    The package "path" wasn't found on the file system but is built into node.
+    - Make sure to prefix the module name with "node:" or update your compatibility_date to 2024-09-23 or later.
+    
+  
+  
+  [31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "stream"[0m
+  
+      node_modules/@zone-eu/mailsplit/lib/node-rewriter.js:5:26:
+  [37m      5 │ const Transform = require([32m'stream'[37m).Transform;
+          ╵                           [32m~~~~~~~~[0m
+  
+    The package "stream" wasn't found on the file system but is built into node.
+    - Make sure to prefix the module name with "node:" or update your compatibility_date to 2024-09-23 or later.
+    
+  
+  
+  [31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "stream"[0m
+  
+      node_modules/@zone-eu/mailsplit/lib/node-streamer.js:5:26:
+  [37m      5 │ const Transform = require([32m'stream'[37m).Transform;
+          ╵                           [32m~~~~~~~~[0m
+  
+    The package "stream" wasn't found on the file system but is built into node.
+    - Make sure to prefix the module name with "node:" or update your compatibility_date to 2024-09-23 or later.
+    
+  
+  
+  [31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "stream"[0m
+  
+      node_modules/mailparser/lib/mail-parser.js:6:26:
+  [37m      6 │ const Transform = require([32m'stream'[37m).Transform;
+          ╵                           [32m~~~~~~~~[0m
+  
+    The package "stream" wasn't found on the file system but is built into node.
+    - Make sure to prefix the module name with "node:" or update your compatibility_date to 2024-09-23 or later.
+    
+  
+  
+  [31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "crypto"[0m
+  
+      node_modules/mailparser/lib/stream-hash.js:3:23:
+  [37m      3 │ const crypto = require([32m'crypto'[37m);
+          ╵                        [32m~~~~~~~~[0m
+  
+    The package "crypto" wasn't found on the file system but is built into node.
+    - Make sure to prefix the module name with "node:" or update your compatibility_date to 2024-09-23 or later.
+    
+  
+  
+  [31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "stream"[0m
+  
+      node_modules/mailparser/lib/stream-hash.js:4:26:
+  [37m      4 │ const Transform = require([32m'stream'[37m).Transform;
+          ╵                           [32m~~~~~~~~[0m
+  
+    The package "stream" wasn't found on the file system but is built into node.
+    - Make sure to prefix the module name with "node:" or update your compatibility_date to 2024-09-23 or later.
+    
+  
+  
+  [31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve "buffer"[0m
+  
+      node_modules/safer-buffer/safer.js:5:21:
+  [37m      5 │ var buffer = require([32m'buffer'[37m)
+          ╵                      [32m~~~~~~~~[0m
+  
+    The package "buffer" wasn't found on the file system but is built into node.
+    - Make sure to prefix the module name with "node:" or update your compatibility_date to 2024-09-23 or later.
+    
+  
+  
+
+
+🪵  Logs were written to "C:\Users\Gary\AppData\Roaming\xdg.config\.wrangler\logs\wrangler-2026-02-03_09-43-06_269.log"
