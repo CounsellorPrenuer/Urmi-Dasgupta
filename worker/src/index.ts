@@ -16,9 +16,17 @@ type Bindings = {
     RESEND_API_KEY: string
 }
 
+
 const app = new Hono<{ Bindings: Bindings }>()
 
-// ... (CORS and other endpoints)
+// CORS Configuration
+app.use('/*', cors({
+    origin: ['https://claryntia.com', 'http://localhost:5173', 'http://127.0.0.1:5173'],
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+}))
+
 
 // Schema for Lead Capture
 const leadSchema = z.object({
