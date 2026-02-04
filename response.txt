@@ -1,1 +1,1 @@
-Enter host password for user 'tFormat':
+Enter host password for user 'tFormat':^C

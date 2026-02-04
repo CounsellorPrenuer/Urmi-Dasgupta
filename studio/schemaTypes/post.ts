@@ -22,6 +22,21 @@ export default defineType({
             validation: (Rule) => Rule.required(),
         }),
         defineField({
+            name: 'mainImage',
+            title: 'Main Image / Thumbnail',
+            type: 'image',
+            options: {
+                hotspot: true,
+            },
+            fields: [
+                {
+                    name: 'alt',
+                    type: 'string',
+                    title: 'Alternative Text',
+                }
+            ]
+        }),
+        defineField({
             name: 'publishedAt',
             title: 'Published at',
             type: 'datetime',

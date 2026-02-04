@@ -39,7 +39,13 @@ export function Blog() {
           slug,
           publishedAt,
           body,
-          "imageUrl": body[_type == "image"][0].asset->url
+          mainImage {
+            asset->{
+              _id,
+              url
+            },
+            alt
+          }
         }
       `);
       return posts;
@@ -129,9 +135,9 @@ export function Blog() {
                       data-testid={`card-blog-${index}`}
                       onClick={() => handleReadMore(post)}
                     >
-                      {post.imageUrl ? (
+                      {post.mainImage?.asset?.url ? (
                         <div className="h-48 relative overflow-hidden">
-                          <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover" />
+                          <img src={post.mainImage.asset.url} alt={post.mainImage.alt || post.title} className="w-full h-full object-cover" />
                           <div className="absolute inset-0 bg-gradient-to-br from-transparent to-primary-purple/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         </div>
                       ) : (
@@ -203,11 +209,11 @@ export function Blog() {
                 </DialogDescription>
               </DialogHeader>
               <ScrollArea className="max-h-[60vh] pr-4">
-                {selectedBlog.imageUrl && (
+                {selectedBlog.mainImage?.asset?.url && (
                   <div className="mb-6 rounded-lg overflow-hidden">
                     <img
-                      src={selectedBlog.imageUrl}
-                      alt={selectedBlog.title}
+                      src={selectedBlog.mainImage.asset.url}
+                      alt={selectedBlog.mainImage.alt || selectedBlog.title}
                       className="w-full h-64 object-cover"
                     />
                   </div>
