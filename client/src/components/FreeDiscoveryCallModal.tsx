@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { config } from '@/lib/config';
+import { generateMailtoUrl } from '@/lib/mailto';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -98,8 +99,23 @@ export function FreeDiscoveryCallModal({ open, onOpenChange }: FreeDiscoveryCall
       if (response.ok && result.success) {
         toast({
           title: 'Discovery Call Request Submitted!',
-          description: 'We\'ll contact you within 24 hours to schedule your free call.',
+          description: 'Opening your email client to send notification...',
         });
+
+        // Generate mailto URL and redirect
+        const mailtoUrl = generateMailtoUrl(
+          {
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            background: data.background,
+            message: data.briefMessage,
+          },
+          'discovery-call'
+        );
+
+        // Open email client
+        window.location.href = mailtoUrl;
 
         form.reset();
         onOpenChange(false);

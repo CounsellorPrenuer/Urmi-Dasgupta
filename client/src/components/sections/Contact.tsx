@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { config } from '@/lib/config';
+import { generateMailtoUrl } from '@/lib/mailto';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useForm } from 'react-hook-form';
@@ -83,8 +84,22 @@ export function Contact() {
       if (response.ok && result.success) {
         toast({
           title: 'Message Sent Successfully!',
-          description: 'We\'ll get back to you within 24 hours.',
+          description: 'Opening your email client to send notification...',
         });
+
+        // Generate mailto URL and redirect
+        const mailtoUrl = generateMailtoUrl(
+          {
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            message: `Purpose: ${data.purpose}\n\n${data.message}`,
+          },
+          'contact'
+        );
+
+        // Open email client
+        window.location.href = mailtoUrl;
 
         form.reset();
       } else {
