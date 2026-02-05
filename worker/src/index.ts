@@ -62,7 +62,7 @@ app.post('/submit-lead', async (c) => {
                     },
                     body: JSON.stringify({
                         from: 'Claryntia <onboarding@resend.dev>', // Use default until domain verified
-                        to: ['joint.arum@gmail.com'],
+                        to: ['claryntia@gmail.com'],
                         subject: `New Lead: ${name}`,
                         html: `
                             <h1>New Lead Captured</h1>

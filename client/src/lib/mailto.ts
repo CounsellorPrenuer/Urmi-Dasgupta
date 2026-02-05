@@ -15,7 +15,7 @@ export function generateMailtoUrl(
     },
     type: 'contact' | 'discovery-call' | 'clarity-call'
 ): string {
-    const recipient = 'joint.arum@gmail.com';
+    const recipient = 'claryntia@gmail.com';
     const subject = `New Lead: ${formData.name} (${type})`;
 
     // Format the email body

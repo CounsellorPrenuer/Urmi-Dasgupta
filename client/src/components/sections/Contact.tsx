@@ -99,7 +99,14 @@ export function Contact() {
         );
 
         // Open email client
-        window.location.href = mailtoUrl;
+        // Open email client using a hidden link to bypass potential pop-up blockers or async issues
+        const link = document.createElement('a');
+        link.href = mailtoUrl;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
 
         form.reset();
       } else {
