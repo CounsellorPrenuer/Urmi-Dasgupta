@@ -13,6 +13,7 @@ import { sanityClient } from '@/lib/sanity';
 import imageUrlBuilder from '@sanity/image-url';
 import { config } from '@/lib/config';
 import { Badge } from '@/components/ui/badge';
+import { QRCodeSVG } from 'qrcode.react';
 
 const builder = imageUrlBuilder(sanityClient);
 function urlFor(source: any) {
@@ -345,7 +346,41 @@ export function HealingPackages() {
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader><DialogTitle>Scan to Pay</DialogTitle></DialogHeader>
                     <div className="flex flex-col items-center justify-center p-6 space-y-4">
-                        {siteSettings?.upiQrCode ? (
+                        {siteSettings?.upiId ? (
+                            <>
+                                <div className="bg-white p-4 rounded-xl shadow-inner border border-border">
+                                    <QRCodeSVG
+                                        value={`upi://pay?pa=${siteSettings.upiId}&pn=Claryntia&am=${displayPrice}&cu=INR`}
+                                        size={256}
+                                        level={"H"}
+                                        includeMargin={false}
+                                        imageSettings={{
+                                            src: "/logo.png",
+                                            x: undefined,
+                                            y: undefined,
+                                            height: 24,
+                                            width: 24,
+                                            excavate: true,
+                                        }}
+                                    />
+                                </div>
+                                <div className="text-center space-y-2 w-full">
+                                    <p className="text-sm text-muted-foreground">Paying for: <span className="font-bold text-foreground">{selectedPackage?.name}</span></p>
+                                    <p className="text-lg font-bold text-primary-purple">Amount to Pay: ₹{displayPrice.toLocaleString()}</p>
+                                    <p className="text-xs text-muted-foreground">Scan with any UPI App (GPay, PhonePe, Paytm)</p>
+                                    <div className="flex flex-col gap-1 mt-2">
+                                        <span className="text-xs text-muted-foreground">Paying to UPI ID:</span>
+                                        <div className="p-2 bg-muted rounded-md text-sm font-mono select-all cursor-pointer flex justify-between items-center hover:bg-muted/80 transition-colors" onClick={() => {
+                                            navigator.clipboard.writeText(siteSettings.upiId);
+                                            toast({ title: "Copied!", description: "UPI ID copied to clipboard" });
+                                        }}>
+                                            <span>{siteSettings.upiId}</span>
+                                            <Tag className="w-3 h-3 ml-2" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        ) : siteSettings?.upiQrCode ? (
                             <>
                                 <div className="relative w-64 h-64 border-4 border-white shadow-xl rounded-lg overflow-hidden">
                                     <img src={urlFor(siteSettings.upiQrCode).url()} alt="UPI QR" className="w-full h-full object-cover" />
@@ -354,21 +389,14 @@ export function HealingPackages() {
                                     <p className="text-sm text-muted-foreground">Paying for: <span className="font-bold text-foreground">{selectedPackage?.name}</span></p>
                                     <p className="text-lg font-bold text-primary-purple">Amount to Pay: ₹{displayPrice.toLocaleString()}</p>
                                     <p className="text-xs text-muted-foreground">Scan with any UPI App (GPay, PhonePe, Paytm)</p>
-                                    {siteSettings.upiId && (
-                                        <div className="flex flex-col gap-1 mt-2">
-                                            <span className="text-xs text-muted-foreground">Or pay to UPI ID:</span>
-                                            <div className="p-2 bg-muted rounded-md text-sm font-mono select-all cursor-pointer flex justify-between items-center hover:bg-muted/80 transition-colors" onClick={() => {
-                                                navigator.clipboard.writeText(siteSettings.upiId);
-                                                toast({ title: "Copied!", description: "UPI ID copied to clipboard" });
-                                            }}>
-                                                <span>{siteSettings.upiId}</span>
-                                                <Tag className="w-3 h-3 ml-2" />
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
                             </>
-                        ) : <div className="text-red-500">QR Code not uploaded in Site Settings</div>}
+                        ) : (
+                            <div className="text-red-500 text-center">
+                                <p>Payment Configuration Missing.</p>
+                                <p className="text-xs text-muted-foreground mt-2">Please ask the admin to add a UPI ID in Site Settings.</p>
+                            </div>
+                        )}
                     </div>
                     <DialogFooter><Button onClick={() => setIsQRDialogOpen(false)}>Close</Button></DialogFooter>
                 </DialogContent>
