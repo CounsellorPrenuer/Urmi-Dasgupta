@@ -77,7 +77,7 @@ export function Blog() {
     emblaApi.on('reInit', onSelect);
   }, [emblaApi, onSelect]);
 
-  const handleReadMore = (post: BlogType) => {
+  const handleReadMore = (post: any) => {
     setSelectedBlog(post);
     setIsModalOpen(true);
   };
@@ -208,7 +208,7 @@ export function Blog() {
                   </div>
                 </DialogDescription>
               </DialogHeader>
-              <ScrollArea className="max-h-[60vh] pr-4">
+              <ScrollArea className="max-h-[75vh] pr-4">
                 {selectedBlog.mainImage?.asset?.url && (
                   <div className="mb-6 rounded-lg overflow-hidden">
                     <img
