@@ -37,7 +37,7 @@ export function MentoriaPackages() {
   useEffect(() => {
     const fetchPricing = async () => {
       try {
-        const query = `*[_type == "pricing" && category == "mentoria"] | order(order asc) {
+        const query = `*[_type == "pricing" && (category == "mentoria" || category == "mentoria-custom")] | order(order asc) {
           planId,
           title,
           description,
