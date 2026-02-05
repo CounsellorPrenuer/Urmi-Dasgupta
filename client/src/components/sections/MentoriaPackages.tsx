@@ -23,7 +23,7 @@ const categoryMapping: Record<string, string> = {
   'Working Professionals': 'working professionals'
 };
 
-import { sanityClient } from '@/lib/sanity';
+import { sanityClient, urlFor } from '@/lib/sanity';
 // Removed static import
 
 export function MentoriaPackages() {
@@ -46,6 +46,7 @@ export function MentoriaPackages() {
           subgroup,
           features,
           isPopular,
+          image,
           "id": planId
         }`;
         const result = await sanityClient.fetch(query);
@@ -95,6 +96,11 @@ export function MentoriaPackages() {
       return pkg.category === selectedCategory;
     });
 
+  const standardPackages = filteredPackages.filter((pkg: any) => pkg.category !== 'mentoria-custom');
+
+  // Custom packages are not filtered by the top tabs, they are their own section
+  const customPackages = (sanityPackages || []).filter((pkg: any) => pkg.category === 'mentoria-custom');
+
   return (
     <section id="mentoria-packages" className="py-24 md:py-32 bg-gradient-to-br from-primary-purple/5 via-background to-secondary-blue/5" ref={ref}>
       <div className="max-w-7xl mx-auto px-6">
@@ -134,7 +140,7 @@ export function MentoriaPackages() {
         </motion.div>
 
         <div className="flex flex-wrap justify-center gap-6">
-          {filteredPackages.map((pkg: any, index: number) => (
+          {standardPackages.map((pkg: any, index: number) => (
             <motion.div
               key={pkg.id}
               initial={{ opacity: 0, y: 30 }}
@@ -173,7 +179,7 @@ export function MentoriaPackages() {
                   <div className="space-y-3">
                     <h4 className="font-semibold text-sm text-muted-foreground">Features:</h4>
                     <ul className="space-y-2">
-                      {pkg.features.map((feature, idx) => (
+                      {pkg.features.map((feature: string, idx: number) => (
                         <li key={idx} className="flex items-start gap-3 text-sm">
                           <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                             <Check className="w-3 h-3 text-emerald-600" />
@@ -199,15 +205,82 @@ export function MentoriaPackages() {
             </motion.div>
           ))}
         </div>
+
+        {/* Custom Packages Section */}
+        {customPackages.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="mt-24"
+          >
+            <div className="text-center mb-12">
+              <h3 className="font-serif text-3xl md:text-4xl font-bold mb-4 text-primary-purple">
+                Want To Customise Your Mentorship Plan?
+              </h3>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                If you want to subscribe to specific services from Mentoria that resolve your career challenges,
+                you can choose one or more of the following:
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+              {customPackages.map((pkg: any) => (
+                <Card
+                  key={pkg.id}
+                  className="overflow-hidden border border-card-border shadow-lg hover:shadow-xl transition-all duration-300 hover:bg-emerald-500/5 group flex flex-col md:flex-row h-full"
+                  data-testid={`card-custom-package-${pkg.id}`}
+                >
+                  <div className="w-full md:w-48 h-48 md:h-auto bg-gray-100 flex-shrink-0 relative overflow-hidden flex items-center justify-center p-4">
+                    {pkg.image ? (
+                      <img
+                        src={urlFor(pkg.image).url()}
+                        alt={pkg.title}
+                        className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
+                      />
+                    ) : (
+                      <div className="text-muted-foreground text-xs text-center">Image not Found</div>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col flex-1 p-6">
+                    <div className="mb-4">
+                      <h4 className="font-serif text-xl font-bold text-foreground mb-1">{pkg.title}</h4>
+                      <div className="text-lg font-bold text-primary-purple">
+                        ₹{pkg.price.toLocaleString()}
+                        {pkg.duration && <span className="text-sm font-normal text-muted-foreground ml-1">/{pkg.duration}</span>}
+                      </div>
+                    </div>
+
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-6 flex-1">
+                      {pkg.description}
+                    </p>
+
+                    <Button
+                      size="default"
+                      className="bg-secondary-blue hover:bg-secondary-blue/90 text-white self-start px-8"
+                      onClick={() => handleBookNow(pkg)}
+                      data-testid={`button-buy-custom-${pkg.id}`}
+                    >
+                      Buy Now
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </div>
 
-      {selectedPackage && (
-        <MentoriaPaymentModal
-          open={isPaymentModalOpen}
-          onOpenChange={setIsPaymentModalOpen}
-          package={selectedPackage}
-        />
-      )}
-    </section>
+      {
+        selectedPackage && (
+          <MentoriaPaymentModal
+            open={isPaymentModalOpen}
+            onOpenChange={setIsPaymentModalOpen}
+            package={selectedPackage as any}
+          />
+        )
+      }
+    </section >
   );
 }

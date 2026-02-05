@@ -12,6 +12,14 @@ export default defineType({
             validation: (Rule) => Rule.required(),
         }),
         defineField({
+            name: 'image',
+            title: 'Package Image',
+            type: 'image',
+            options: {
+                hotspot: true,
+            },
+        }),
+        defineField({
             name: 'planId',
             title: 'Plan ID',
             type: 'string',
@@ -57,6 +65,7 @@ export default defineType({
                 list: [
                     { title: 'Healing Packages', value: 'healing' },
                     { title: 'Mentoria Packages', value: 'mentoria' },
+                    { title: 'Mentoria Custom Packages', value: 'mentoria-custom' },
                 ],
             },
             validation: (Rule) => Rule.required(),

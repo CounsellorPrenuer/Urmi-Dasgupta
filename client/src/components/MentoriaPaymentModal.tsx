@@ -12,9 +12,11 @@ import type { MentoriaPackage } from '@shared/schema';
 import { config } from '@/lib/config';
 
 const paymentFormSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
+  firstName: z.string().min(2, 'First Name must be at least 2 characters'),
+  lastName: z.string().min(2, 'Last Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
   phone: z.string().min(10, 'Please enter a valid 10-digit mobile number'),
+  background: z.string().min(1, 'Please select your background'),
   coupon: z.string().optional(),
 });
 
@@ -42,6 +44,21 @@ declare global {
   }
 }
 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+const backgroundOptions = [
+  'Student (High School)',
+  'Student (College/University)',
+  'Fresh Graduate',
+  'Working Professional (0-3 years)',
+  'Working Professional (3-7 years)',
+  'Working Professional (7+ years)',
+  'Career Break/Transition',
+  'Entrepreneur/Business Owner',
+  'Seeking Career Change',
+  'Other',
+];
+
 export function MentoriaPaymentModal({ open, onOpenChange, package: pkg }: MentoriaPaymentModalProps) {
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -49,9 +66,11 @@ export function MentoriaPaymentModal({ open, onOpenChange, package: pkg }: Mento
   const form = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentFormSchema),
     defaultValues: {
-      name: '',
+      firstName: '',
+      lastName: '',
       email: '',
       phone: '',
+      background: '',
       coupon: '',
     },
   });
@@ -65,10 +84,10 @@ export function MentoriaPaymentModal({ open, onOpenChange, package: pkg }: Mento
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: data.name,
+          name: `${data.firstName} ${data.lastName}`,
           email: data.email,
           phone: data.phone,
-          message: `Initiated payment for ${pkg.name} (Mentoria)`
+          message: `Initiated payment for ${pkg.name} (Mentoria)\nBackground: ${data.background}`
         }),
       });
 
@@ -97,7 +116,7 @@ export function MentoriaPaymentModal({ open, onOpenChange, package: pkg }: Mento
         description: `${pkg.name}`,
         order_id: orderData.order_id,
         prefill: {
-          name: data.name,
+          name: `${data.firstName} ${data.lastName}`,
           email: data.email,
           contact: data.phone,
         },
@@ -165,19 +184,34 @@ export function MentoriaPaymentModal({ open, onOpenChange, package: pkg }: Mento
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Full Name *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your full name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="firstName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>First Name *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="First Name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="lastName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Last Name *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Last Name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}
@@ -202,6 +236,31 @@ export function MentoriaPaymentModal({ open, onOpenChange, package: pkg }: Mento
                   <FormControl>
                     <Input type="tel" placeholder="+91 98765 43210" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="background"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Background *</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select your background" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {backgroundOptions.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
