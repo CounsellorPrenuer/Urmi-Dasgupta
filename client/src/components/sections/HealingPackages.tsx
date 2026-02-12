@@ -177,11 +177,12 @@ export function HealingPackages() {
     };
 
     const [displayPrice, setDisplayPrice] = useState(0);
+    const finalUpiId = siteSettings?.upiId || "joint.arum@okaxis";
 
     const handleUPIPayment = async () => {
         if (!validateForm()) return;
 
-        if (!siteSettings?.upiQrCode) {
+        if (!finalUpiId && !siteSettings?.upiQrCode) {
             toast({ title: "UPI Unavailable", description: "QR Code has not been configured yet.", variant: "destructive" });
             return;
         }
@@ -345,25 +346,25 @@ export function HealingPackages() {
             <Dialog open={isQRDialogOpen} onOpenChange={setIsQRDialogOpen}>
                 <DialogContent
                     className="sm:max-w-md"
-                    hideClose={!!siteSettings?.upiId || !!siteSettings?.upiQrCode}
+                    hideClose={!!finalUpiId || !!siteSettings?.upiQrCode}
                     onInteractOutside={(e) => {
-                        if (siteSettings?.upiId || siteSettings?.upiQrCode) {
+                        if (finalUpiId || siteSettings?.upiQrCode) {
                             e.preventDefault();
                         }
                     }}
                     onEscapeKeyDown={(e) => {
-                        if (siteSettings?.upiId || siteSettings?.upiQrCode) {
+                        if (finalUpiId || siteSettings?.upiQrCode) {
                             e.preventDefault();
                         }
                     }}
                 >
                     <DialogHeader><DialogTitle>Scan to Pay</DialogTitle></DialogHeader>
                     <div className="flex flex-col items-center justify-center p-6 space-y-4">
-                        {siteSettings?.upiId ? (
+                        {finalUpiId ? (
                             <>
                                 <div className="bg-white p-4 rounded-xl shadow-inner border border-border">
                                     <QRCodeSVG
-                                        value={`upi://pay?pa=${siteSettings.upiId}&pn=Claryntia&am=${displayPrice}&cu=INR`}
+                                        value={`upi://pay?pa=${finalUpiId}&pn=Claryntia&am=${displayPrice}&cu=INR`}
                                         size={256}
                                         level={"H"}
                                         includeMargin={false}
@@ -384,10 +385,10 @@ export function HealingPackages() {
                                     <div className="flex flex-col gap-1 mt-2">
                                         <span className="text-xs text-muted-foreground">Paying to UPI ID:</span>
                                         <div className="p-2 bg-muted rounded-md text-sm font-mono select-all cursor-pointer flex justify-between items-center hover:bg-muted/80 transition-colors" onClick={() => {
-                                            navigator.clipboard.writeText(siteSettings.upiId);
+                                            navigator.clipboard.writeText(finalUpiId);
                                             toast({ title: "Copied!", description: "UPI ID copied to clipboard" });
                                         }}>
-                                            <span>{siteSettings.upiId}</span>
+                                            <span>{finalUpiId}</span>
                                             <Tag className="w-3 h-3 ml-2" />
                                         </div>
                                     </div>
