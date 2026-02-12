@@ -142,9 +142,12 @@ export function Hero() {
                   src={videoUrl}
                   autoPlay
                   loop
+                  muted={isMuted}
                   playsInline
-                  className="w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 object-contain rounded-full shadow-2xl"
+                  onClick={toggleMute}
+                  className="w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 object-contain rounded-full shadow-2xl cursor-pointer hover:scale-105 transition-transform duration-300"
                   data-testid="video-logo"
+                  title="Click to unmute"
                 />
               </div>
             ) : (
