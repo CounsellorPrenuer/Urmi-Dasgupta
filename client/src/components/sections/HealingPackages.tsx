@@ -398,7 +398,7 @@ export function HealingPackages() {
                             </div>
                         )}
                     </div>
-                    <DialogFooter><Button onClick={() => setIsQRDialogOpen(false)}>Close</Button></DialogFooter>
+
                 </DialogContent>
             </Dialog>
         </section >
