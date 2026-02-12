@@ -1,12 +1,45 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Volume2, VolumeX } from 'lucide-react';
 import logoImg from '@assets/generated-image(1)_1762374279351.png';
 import { FreeDiscoveryCallModal } from '@/components/FreeDiscoveryCallModal';
+import { sanityClient } from '@/lib/sanity';
+import { config } from '@/lib/config';
 
 export function Hero() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [isMuted, setIsMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const query = `*[_type == "siteSettings"][0]{
+          videoLogo {
+            asset->{
+              url
+            }
+          }
+        }`;
+        const result = await sanityClient.fetch(query);
+        if (result?.videoLogo?.asset?.url) {
+          setVideoUrl(result.videoLogo.asset.url);
+        }
+      } catch (error) {
+        console.error("Error fetching video logo:", error);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setIsMuted(videoRef.current.muted);
+    }
+  };
 
   const scrollToSection = (sectionId: string) => {
     const element = document.querySelector(sectionId);
@@ -18,7 +51,7 @@ export function Hero() {
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-purple-900 via-purple-950 to-slate-900">
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900/90 via-purple-950/90 to-slate-900/90" />
-      
+
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Side - Text Content */}
@@ -59,8 +92,8 @@ export function Hero() {
               transition={{ duration: 0.8, delay: 0.6 }}
               className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
             >
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700 hover:from-emerald-600 hover:via-emerald-700 hover:to-emerald-800 text-white px-8 py-6 text-lg rounded-full group shadow-xl"
                 data-testid="button-free-call"
                 onClick={() => setIsModalOpen(true)}
@@ -68,9 +101,9 @@ export function Hero() {
                 Free Clarity Call
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
+              <Button
+                size="lg"
+                variant="outline"
                 className="px-8 py-6 text-lg rounded-full border-2 border-white text-white hover:bg-white hover:text-primary-purple transition-colors"
                 data-testid="button-learn-more"
                 onClick={() => scrollToSection('#who-we-help')}
@@ -80,20 +113,20 @@ export function Hero() {
             </motion.div>
           </div>
 
-          {/* Right Side - Logo */}
+          {/* Right Side - Logo / Video */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
-            animate={{ 
-              opacity: 1, 
+            animate={{
+              opacity: 1,
               x: 0,
               y: [0, -20, 0]
             }}
-            transition={{ 
+            transition={{
               opacity: { duration: 0.8, delay: 0.3 },
               x: { duration: 0.8, delay: 0.3 },
-              y: { 
-                duration: 3, 
-                repeat: Infinity, 
+              y: {
+                duration: 3,
+                repeat: Infinity,
                 ease: "easeInOut",
                 delay: 0.3
               }
@@ -101,12 +134,35 @@ export function Hero() {
             className="flex justify-center relative group"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/0 via-emerald-500/0 to-emerald-600/0 group-hover:from-emerald-400/30 group-hover:via-emerald-500/40 group-hover:to-emerald-600/30 rounded-full blur-3xl transition-all duration-1500 ease-in-out" />
-            <img 
-              src={logoImg} 
-              alt="Claryntia Logo" 
-              className="w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 object-contain relative z-10"
-              data-testid="img-logo"
-            />
+
+            {videoUrl ? (
+              <div className="relative z-10">
+                <video
+                  ref={videoRef}
+                  src={videoUrl}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 object-contain rounded-full shadow-2xl"
+                  data-testid="video-logo"
+                />
+                <button
+                  onClick={toggleMute}
+                  className="absolute bottom-4 right-4 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
+                  title={isMuted ? "Unmute" : "Mute"}
+                >
+                  {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                </button>
+              </div>
+            ) : (
+              <img
+                src={logoImg}
+                alt="Claryntia Logo"
+                className="w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 object-contain relative z-10"
+                data-testid="img-logo"
+              />
+            )}
           </motion.div>
         </div>
       </div>
