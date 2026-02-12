@@ -28,5 +28,12 @@ export default defineType({
             type: 'string',
             description: 'e.g. yourname@upi',
         }),
+        defineField({
+            name: 'videoLogo',
+            title: 'Video Logo',
+            type: 'file',
+            description: 'Upload a video file (MP4) to replace the static logo. If uploaded, this will take precedence.',
+            options: { accept: 'video/*' },
+        }),
     ],
 })
