@@ -345,9 +345,17 @@ export function HealingPackages() {
             <Dialog open={isQRDialogOpen} onOpenChange={setIsQRDialogOpen}>
                 <DialogContent
                     className="sm:max-w-md"
-                    hideClose={true}
-                    onInteractOutside={(e) => e.preventDefault()}
-                    onEscapeKeyDown={(e) => e.preventDefault()}
+                    hideClose={!!siteSettings?.upiId || !!siteSettings?.upiQrCode}
+                    onInteractOutside={(e) => {
+                        if (siteSettings?.upiId || siteSettings?.upiQrCode) {
+                            e.preventDefault();
+                        }
+                    }}
+                    onEscapeKeyDown={(e) => {
+                        if (siteSettings?.upiId || siteSettings?.upiQrCode) {
+                            e.preventDefault();
+                        }
+                    }}
                 >
                     <DialogHeader><DialogTitle>Scan to Pay</DialogTitle></DialogHeader>
                     <div className="flex flex-col items-center justify-center p-6 space-y-4">
