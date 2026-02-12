@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Volume2, VolumeX } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import logoImg from '@assets/generated-image(1)_1762374279351.png';
 import { FreeDiscoveryCallModal } from '@/components/FreeDiscoveryCallModal';
 import { sanityClient } from '@/lib/sanity';
@@ -10,7 +10,6 @@ import { config } from '@/lib/config';
 export function Hero() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
-  const [isMuted, setIsMuted] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -34,12 +33,52 @@ export function Hero() {
     fetchSettings();
   }, []);
 
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-      setIsMuted(videoRef.current.muted);
-    }
-  };
+  // Attempt to unmute after autoplay starts, with fallback to first user interaction
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !videoUrl) return;
+
+    const tryUnmute = () => {
+      if (video) {
+        video.muted = false;
+        video.volume = 1.0;
+      }
+    };
+
+    // When video starts playing (muted), try to unmute
+    const handlePlaying = () => {
+      try {
+        tryUnmute();
+      } catch {
+        // Browser blocked unmuting, wait for user interaction
+      }
+    };
+
+    // Fallback: unmute on first user interaction anywhere on the page
+    const handleFirstInteraction = () => {
+      tryUnmute();
+      // Also ensure it's playing
+      if (video.paused) {
+        video.play().catch(() => { });
+      }
+      // Remove listeners after first interaction
+      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('touchstart', handleFirstInteraction);
+      document.removeEventListener('keydown', handleFirstInteraction);
+    };
+
+    video.addEventListener('playing', handlePlaying);
+    document.addEventListener('click', handleFirstInteraction);
+    document.addEventListener('touchstart', handleFirstInteraction);
+    document.addEventListener('keydown', handleFirstInteraction);
+
+    return () => {
+      video.removeEventListener('playing', handlePlaying);
+      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('touchstart', handleFirstInteraction);
+      document.removeEventListener('keydown', handleFirstInteraction);
+    };
+  }, [videoUrl]);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.querySelector(sectionId);
@@ -142,12 +181,10 @@ export function Hero() {
                   src={videoUrl}
                   autoPlay
                   loop
-                  muted={isMuted}
+                  muted
                   playsInline
-                  onClick={toggleMute}
-                  className="w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 object-contain rounded-full shadow-2xl cursor-pointer hover:scale-105 transition-transform duration-300"
+                  className="w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 object-contain rounded-full shadow-2xl"
                   data-testid="video-logo"
-                  title="Click to unmute"
                 />
               </div>
             ) : (
