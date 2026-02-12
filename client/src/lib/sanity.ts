@@ -5,7 +5,7 @@ export const sanityClient = createClient({
     projectId: "8b1oyfam",
     dataset: "production",
     apiVersion: "2024-01-24", // use current date
-    useCdn: true, // true for production, false for development
+    useCdn: false, // true for production, false for development
 });
 
 const builder = imageUrlBuilder(sanityClient);
