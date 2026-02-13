@@ -346,7 +346,8 @@ export function HealingPackages() {
             <Dialog open={isQRDialogOpen} onOpenChange={setIsQRDialogOpen}>
                 <DialogContent className="sm:max-w-md" hideClose={true}>
                     <Button
-                        className="absolute !right-4 !top-4 h-8 w-8 p-0 rounded-full bg-muted/50 hover:bg-muted z-50"
+                        className="absolute h-8 w-8 p-0 rounded-full bg-muted/50 hover:bg-muted z-50"
+                        style={{ position: 'absolute', right: '1rem', top: '1rem', left: 'auto' }}
                         variant="ghost"
                         onClick={() => setIsQRDialogOpen(false)}
                     >
