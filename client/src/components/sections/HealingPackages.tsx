@@ -344,7 +344,7 @@ export function HealingPackages() {
             </Dialog>
 
             <Dialog open={isQRDialogOpen} onOpenChange={setIsQRDialogOpen}>
-                <DialogContent className="sm:max-w-md">
+                <DialogContent className="sm:max-w-md" hideClose={true}>
                     <DialogHeader className="relative">
                         <DialogTitle>Scan to Pay</DialogTitle>
                         <Button
