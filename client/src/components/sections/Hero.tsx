@@ -152,7 +152,6 @@ export function Hero() {
             </motion.div>
           </div>
 
-          {/* Right Side - Logo / Video */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{
@@ -171,6 +170,16 @@ export function Hero() {
               }
             }}
             className="flex justify-center relative group"
+            onClick={() => {
+              // Direct interaction handler for the container
+              if (videoRef.current) {
+                videoRef.current.muted = false;
+                videoRef.current.volume = 1.0;
+                if (videoRef.current.paused) {
+                  videoRef.current.play().catch(() => { });
+                }
+              }
+            }}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/0 via-emerald-500/0 to-emerald-600/0 group-hover:from-emerald-400/30 group-hover:via-emerald-500/40 group-hover:to-emerald-600/30 rounded-full blur-3xl transition-all duration-1500 ease-in-out" />
 
@@ -179,10 +188,14 @@ export function Hero() {
                 <video
                   ref={videoRef}
                   src={videoUrl}
+                  poster={logoImg}
                   autoPlay
                   loop
                   muted
                   playsInline
+                  // @ts-ignore
+                  webkit-playsinline="true"
+                  x-webkit-airplay="allow"
                   className="w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 object-contain rounded-full shadow-2xl"
                   data-testid="video-logo"
                 />
