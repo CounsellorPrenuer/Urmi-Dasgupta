@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Check, ChevronLeft, ChevronRight, Loader2, Star, Tag } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Loader2, Star, Tag, X } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { sanityClient } from '@/lib/sanity';
 import imageUrlBuilder from '@sanity/image-url';
@@ -344,21 +344,17 @@ export function HealingPackages() {
             </Dialog>
 
             <Dialog open={isQRDialogOpen} onOpenChange={setIsQRDialogOpen}>
-                <DialogContent
-                    className="sm:max-w-md"
-                    hideClose={!!finalUpiId || !!siteSettings?.upiQrCode}
-                    onInteractOutside={(e) => {
-                        if (finalUpiId || siteSettings?.upiQrCode) {
-                            e.preventDefault();
-                        }
-                    }}
-                    onEscapeKeyDown={(e) => {
-                        if (finalUpiId || siteSettings?.upiQrCode) {
-                            e.preventDefault();
-                        }
-                    }}
-                >
-                    <DialogHeader><DialogTitle>Scan to Pay</DialogTitle></DialogHeader>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader className="relative">
+                        <DialogTitle>Scan to Pay</DialogTitle>
+                        <Button
+                            className="absolute right-0 top-0 p-2 h-auto w-auto rounded-full hover:bg-muted"
+                            variant="ghost"
+                            onClick={() => setIsQRDialogOpen(false)}
+                        >
+                            <X className="w-4 h-4" />
+                        </Button>
+                    </DialogHeader>
                     <div className="flex flex-col items-center justify-center p-6 space-y-4">
                         {finalUpiId ? (
                             <>
