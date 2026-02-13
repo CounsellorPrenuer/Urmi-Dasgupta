@@ -11,6 +11,26 @@
     // Force a non-cached fetch of the dist folder
     var time = new Date().getTime();
     window.location.replace("dist/?v=" + time);
+
+    // Global Audio Unlocker for Mobile
+    function unlockAudio() {
+      var videos = document.getElementsByTagName('video');
+      for (var i = 0; i < videos.length; i++) {
+        try {
+          videos[i].muted = false;
+          videos[i].volume = 1.0;
+          videos[i].play();
+        } catch (e) { }
+      }
+      // Remove listeners once unlocked
+      document.removeEventListener('touchstart', unlockAudio);
+      document.removeEventListener('click', unlockAudio);
+      document.removeEventListener('scroll', unlockAudio);
+    }
+
+    document.addEventListener('touchstart', unlockAudio, { passive: true });
+    document.addEventListener('click', unlockAudio, { passive: true });
+    document.addEventListener('scroll', unlockAudio, { passive: true });
   </script>
 </head>
 

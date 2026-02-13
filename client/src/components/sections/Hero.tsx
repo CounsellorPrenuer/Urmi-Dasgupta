@@ -189,6 +189,7 @@ export function Hero() {
                   ref={videoRef}
                   src={videoUrl}
                   poster={logoImg}
+                  preload="auto"
                   autoPlay
                   loop
                   muted
