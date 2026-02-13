@@ -3,15 +3,19 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=dist/">
-  <script type="text/javascript">
-    window.location.href = "dist/";
-  </script>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Redirecting...</title>
+  <script type="text/javascript">
+    // Force a non-cached fetch of the dist folder
+    var time = new Date().getTime();
+    window.location.replace("dist/?v=" + time);
+  </script>
 </head>
 
 <body>
-  <p>If you are not redirected automatically, follow this <a href="dist/">link to the app</a>.</p>
+  <p>Loading latest version... <a href="dist/">Click here if not redirected</a>.</p>
 </body>
 
 </html>
