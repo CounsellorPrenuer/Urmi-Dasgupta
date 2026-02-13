@@ -345,17 +345,14 @@ export function HealingPackages() {
 
             <Dialog open={isQRDialogOpen} onOpenChange={setIsQRDialogOpen}>
                 <DialogContent className="sm:max-w-md" hideClose={true}>
-                    <DialogHeader className="relative">
-                        <DialogTitle>Scan to Pay</DialogTitle>
-                        <Button
-                            className="absolute right-0 top-0 p-2 h-auto w-auto rounded-full hover:bg-muted"
-                            variant="ghost"
-                            onClick={() => setIsQRDialogOpen(false)}
-                        >
-                            <X className="w-4 h-4" />
-                        </Button>
-                    </DialogHeader>
-                    <div className="flex flex-col items-center justify-center p-6 space-y-4">
+                    <Button
+                        className="absolute right-4 top-4 p-2 h-auto w-auto rounded-full hover:bg-muted z-50"
+                        variant="ghost"
+                        onClick={() => setIsQRDialogOpen(false)}
+                    >
+                        <X className="w-4 h-4" />
+                    </Button>
+                    <div className="flex flex-col items-center justify-center p-6 space-y-4 mt-4">
                         {finalUpiId ? (
                             <>
                                 <div className="bg-white p-4 rounded-xl shadow-inner border border-border">
