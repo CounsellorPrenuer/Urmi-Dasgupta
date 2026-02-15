@@ -251,7 +251,7 @@ export function Packages() {
                       data-testid={`card-package-${index}`}
                     >
                       <CardHeader className="space-y-0 pb-6 pt-8">
-                        <CardTitle className="font-serif text-2xl mb-2 bg-gradient-to-r from-accent-orange to-orange-600 bg-clip-text text-transparent font-bold">{pkg.name}</CardTitle>
+                        <CardTitle className="font-serif text-2xl mb-2 text-primary-purple font-bold">{pkg.name}</CardTitle>
                         <p className="text-sm text-muted-foreground mb-2">{pkg.description}</p>
                         {pkg.duration && (
                           <p className="text-xs text-muted-foreground mb-4">{pkg.duration}</p>
