@@ -272,16 +272,58 @@ app.post('/razorpay-webhook', async (c) => {
 
             if (success) {
                 console.log(`Transaction ${orderId} updated to ${currentStatus}`)
+
+                // Send Confirmation Emails
+                const email = payment.email;
+                const phone = payment.contact;
+                // We don't have name in payload usually unless passed in notes, but we can try notes or generic.
+                const name = payment.notes?.name || 'Valued Customer';
+                const planName = payment.notes?.planName || 'Mentorship Package';
+
+                // Email Admin
+                await sendEmail(c.env.RESEND_API_KEY, ['claryntia@gmail.com'], `Payment Received: ${name}`, `
+                    <h1>New Payment Received</h1>
+                    <p><strong>Customer:</strong> ${name}</p>
+                    <p><strong>Email:</strong> ${email}</p>
+                    <p><strong>Phone:</strong> ${phone}</p>
+                    <p><strong>Plan:</strong> ${planName}</p>
+                    <p><strong>Amount:</strong> ₹${payment.amount / 100}</p>
+                    <p><strong>Order ID:</strong> ${orderId}</p>
+                    <p><strong>Payment ID:</strong> ${payment.id}</p>
+                `);
+
+                // Email Customer
+                await sendEmail(c.env.RESEND_API_KEY, [email], `Payment Successful - Claryntia`, `
+                    <h1>Payment Confirmed!</h1>
+                    <p>Dear ${name},</p>
+                    <p>Thank you for your payment. We have successfully received it.</p>
+                    <p><strong>Plan:</strong> ${planName}</p>
+                    <p><strong>Amount:</strong> ₹${payment.amount / 100}</p>
+                    <p>We will be in touch shortly to schedule your sessions.</p>
+                    <br/>
+                    <p>Warm Regards,<br/>Claryntia Team</p>
+                `);
+
             } else {
                 console.error(`Failed to update transaction ${orderId}`)
             }
         } else if (event === 'payment.failed') {
             const payment = body.payload.payment.entity
             const orderId = payment.order_id
+            const email = payment.email;
 
             await c.env.DB.prepare(
                 `UPDATE transactions SET status = 'failed', updated_at = ? WHERE order_id = ?`
             ).bind(Date.now(), orderId).run()
+
+            // Optional: Email customer about failure
+            if (email) {
+                await sendEmail(c.env.RESEND_API_KEY, [email], `Payment Failed - Claryntia`, `
+                    <h1>Payment Failed</h1>
+                    <p>We noticed a failed payment attempt for order ${orderId}.</p>
+                    <p>Please try again or contact us if you need assistance.</p>
+                `);
+            }
         }
 
         return c.json({ success: true, status: 'ok' })
@@ -394,6 +436,76 @@ app.get('/api/payments', async (c) => {
     }
 });
 
+// Helper to send emails via Resend
+async function sendEmail(apiKey: string, to: string[], subject: string, html: string) {
+    if (!apiKey) {
+        console.log('Skipping email: No API Key');
+        return;
+    }
+    try {
+        const res = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                from: 'Claryntia <onboarding@resend.dev>',
+                to,
+                subject,
+                html
+            })
+        });
+
+        if (!res.ok) {
+            console.error('Resend Error:', await res.text());
+        } else {
+            const data = await res.json() as any;
+            console.log('Email sent:', data?.id);
+        }
+    } catch (err) {
+        console.error('Email fetch error:', err);
+    }
+}
+
+// Manual Payment Notification (for UPI/QR)
+app.post('/notify-manual-payment', async (c) => {
+    try {
+        const body = await c.req.json();
+        const { name, email, phone, packageName, amount } = body;
+
+        // 1. Save to Leads/Transactions (Optional, but good for record)
+        // For now, fast path: just email.
+
+        // 2. Email Admin
+        await sendEmail(c.env.RESEND_API_KEY, ['claryntia@gmail.com'], `Payment Claim: ${name}`, `
+            <h1>Manual Payment Claimed</h1>
+            <p><strong>Customer:</strong> ${name}</p>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Phone:</strong> ${phone}</p>
+            <p><strong>Package:</strong> ${packageName}</p>
+            <p><strong>Amount:</strong> ₹${amount}</p>
+            <p>Please check your bank account and verify.</p>
+        `);
+
+        // 3. Email Customer
+        await sendEmail(c.env.RESEND_API_KEY, [email], `Payment Confirmation Pending - Claryntia`, `
+            <h1>Thank you, ${name}!</h1>
+            <p>We have received your payment notification for <strong>${packageName}</strong>.</p>
+            <p>We are verifying the transfer and will confirm shortly via WhatsApp/Email.</p>
+            <p>Amount: ₹${amount}</p>
+            <br/>
+            <p>Warm Regards,<br/>Claryntia Team</p>
+        `);
+
+        return c.json({ success: true, message: 'Notification sent' });
+
+    } catch (e) {
+        console.error('Manual notification error:', e);
+        return c.json({ success: false, message: 'Failed to send notification' }, 500);
+    }
+});
+
 // Helper for hex string to bytes (needed for signature verification)
 function hexToBytes(hex: string): Uint8Array {
     const bytes = new Uint8Array(hex.length / 2)
@@ -403,4 +515,4 @@ function hexToBytes(hex: string): Uint8Array {
     return bytes
 }
 
-export default app
+export default app;

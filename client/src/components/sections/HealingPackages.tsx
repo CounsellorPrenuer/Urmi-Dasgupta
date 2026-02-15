@@ -239,6 +239,46 @@ export function HealingPackages() {
         }
     };
 
+    const handleManualPayment = async () => {
+        setIsProcessing(true);
+        try {
+            const response = await fetch(`${config.api.baseUrl}/notify-manual-payment`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: customerInfo.name,
+                    email: customerInfo.email,
+                    phone: customerInfo.phone,
+                    packageName: selectedPackage?.name,
+                    amount: displayPrice
+                }),
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                toast({
+                    title: "Payment Notification Sent!",
+                    description: "We will verify your payment and contact you shortly.",
+                    duration: 5000,
+                });
+                setIsQRDialogOpen(false);
+                setCustomerInfo({ name: '', email: '', phone: '' });
+            } else {
+                throw new Error(data.message || "Failed to notify");
+            }
+
+        } catch (error) {
+            console.error("Manual payment notification error:", error);
+            toast({
+                title: "Notification Failed",
+                description: "Please contact us directly via WhatsApp.",
+                variant: "destructive"
+            });
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
     const validateForm = () => {
         if (!customerInfo.name || !customerInfo.email || !customerInfo.phone) {
             toast({ title: "Missing Information", description: "Please fill in all required fields", variant: "destructive" });
@@ -405,6 +445,19 @@ export function HealingPackages() {
                                 <p className="text-xs text-muted-foreground mt-2">Please ask the admin to add a UPI ID in Site Settings.</p>
                             </div>
                         )}
+                    </div>
+                    <div className="flex flex-col gap-3 px-6 pb-6">
+                        <Button
+                            onClick={handleManualPayment}
+                            disabled={isProcessing}
+                            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                        >
+                            {isProcessing ? <Loader2 className="animate-spin mr-2" /> : <Check className="w-5 h-5 mr-2" />}
+                            I have made the payment
+                        </Button>
+                        <p className="text-xs text-center text-muted-foreground">
+                            Click above after completing the UPI transaction.
+                        </p>
                     </div>
 
                 </DialogContent>
