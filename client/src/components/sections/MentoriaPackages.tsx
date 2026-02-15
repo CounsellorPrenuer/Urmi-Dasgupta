@@ -165,7 +165,7 @@ export function MentoriaPackages() {
                 )}
 
                 <CardHeader className="space-y-2">
-                  <CardTitle className="font-serif text-2xl text-accent-orange">{pkg.name}</CardTitle>
+                  <CardTitle className="font-serif text-2xl text-primary-purple">{pkg.name}</CardTitle>
                   <div className="text-sm text-muted-foreground capitalize">{pkg.category}</div>
                   <div className="pt-2">
                     <div className="text-3xl font-bold text-primary-purple">
@@ -245,7 +245,7 @@ export function MentoriaPackages() {
 
                   <div className="flex flex-col flex-1 p-6">
                     <div className="mb-4">
-                      <h4 className="font-serif text-xl font-bold text-foreground mb-1">{pkg.title}</h4>
+                      <h4 className="font-serif text-xl font-bold text-primary-purple mb-1">{pkg.title}</h4>
                       <div className="text-lg font-bold text-primary-purple">
                         ₹{pkg.price.toLocaleString()}
                         {pkg.duration && <span className="text-sm font-normal text-muted-foreground ml-1">/{pkg.duration}</span>}
@@ -258,7 +258,7 @@ export function MentoriaPackages() {
 
                     <Button
                       size="default"
-                      className="bg-secondary-blue hover:bg-secondary-blue/90 text-white self-start px-8"
+                      className="bg-primary-purple hover:bg-primary-purple/90 text-white self-start px-8"
                       onClick={() => handleBookNow(pkg)}
                       data-testid={`button-buy-custom-${pkg.id}`}
                     >
